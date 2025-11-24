@@ -4796,7 +4796,8 @@
             "headers": {
               "name": "Name",
               "type": "Type",
-              "file_name": "File name"
+              "file_name": "File name",
+              "usage_count": "In use"
             },
             "types": {
               "automation": "Automation",

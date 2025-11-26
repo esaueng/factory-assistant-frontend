@@ -40,13 +40,22 @@ const OVERVIEW_VIEW = {
     type: "energy-overview",
     collection_key: DEFAULT_ENERGY_COLLECTION_KEY,
   },
-};
+} as LovelaceViewConfig;
 
 const ELECTRICITY_VIEW = {
   back_path: "/energy",
   path: "electricity",
   strategy: {
     type: "energy-electricity",
+    collection_key: DEFAULT_ENERGY_COLLECTION_KEY,
+  },
+} as LovelaceViewConfig;
+
+const WATER_VIEW = {
+  back_path: "/energy",
+  path: "water",
+  strategy: {
+    type: "energy-water",
     collection_key: DEFAULT_ENERGY_COLLECTION_KEY,
   },
 } as LovelaceViewConfig;
@@ -248,9 +257,16 @@ class PanelEnergy extends LitElement {
         views: [ELECTRICITY_VIEW],
       };
     }
-    return {
-      views: [OVERVIEW_VIEW, ELECTRICITY_VIEW],
-    };
+
+    const hasWater =
+      prefs.energy_sources.some((source) => source.type === "water") ||
+      prefs.device_consumption_water?.length > 0;
+
+    const views: LovelaceViewConfig[] = [OVERVIEW_VIEW, ELECTRICITY_VIEW];
+    if (hasWater) {
+      views.push(WATER_VIEW);
+    }
+    return { views };
   }
 
   private _setLovelace() {

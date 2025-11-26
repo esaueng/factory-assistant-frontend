@@ -7088,7 +7088,9 @@
             "unamed_device": "Unnamed device",
             "others": "Others",
             "scenes": "Scenes",
-            "automations": "Automations"
+            "automations": "Automations",
+            "for_you": "For you",
+            "home": "Home"
           },
           "common_controls": {
             "not_loaded": "Usage Prediction integration is not loaded.",
@@ -7360,6 +7362,8 @@
             "header": "View configuration",
             "header_name": "{name} view configuration",
             "add": "Add view",
+            "show_sidebar": "Show sidebar",
+            "show_content": "Show content",
             "background": {
               "settings": "Background settings",
               "image": "Background image",

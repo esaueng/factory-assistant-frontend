@@ -143,7 +143,6 @@ class HassSubpage extends LitElement {
           -webkit-box-orient: vertical;
           overflow: hidden;
           text-overflow: ellipsis;
-          padding-bottom: 1px;
         }
 
         .content {

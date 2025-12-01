@@ -9567,8 +9567,9 @@
         }
       },
       "energy": {
-        "overview": {
-          "electricity": "Electricity",
+        "title": {
+          "energy": "Energy",
+          "power": "Power",
           "gas": "Gas",
           "water": "Water"
         },

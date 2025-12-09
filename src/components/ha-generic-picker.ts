@@ -7,6 +7,7 @@ import { ifDefined } from "lit/directives/if-defined";
 import memoizeOne from "memoize-one";
 import { tinykeys } from "tinykeys";
 import { fireEvent } from "../common/dom/fire_event";
+import type { FuseWeightedKey } from "../resources/fuseMultiTerm";
 import type { HomeAssistant } from "../types";
 import "./ha-bottom-sheet";
 import "./ha-button";
@@ -65,6 +66,9 @@ export class HaGenericPicker extends LitElement {
 
   @property({ attribute: false })
   public searchFn?: PickerComboBoxSearchFn<PickerComboBoxItem>;
+
+  @property({ attribute: false })
+  public searchKeys?: FuseWeightedKey[];
 
   @property({ attribute: false })
   public notFoundLabel?: string | ((search: string) => string);
@@ -235,6 +239,7 @@ export class HaGenericPicker extends LitElement {
         .sections=${this.sections}
         .sectionTitleFunction=${this.sectionTitleFunction}
         .selectedSection=${this.selectedSection}
+        .searchKeys=${this.searchKeys}
       ></ha-picker-combo-box>
     `;
   }

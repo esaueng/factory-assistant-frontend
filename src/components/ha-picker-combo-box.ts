@@ -80,7 +80,7 @@ export class HaPickerComboBox extends ScrollableFadeMixin(LitElement) {
   @state() private _listScrolled = false;
 
   @property({ attribute: false })
-  public getItems?: (
+  public getItems!: (
     searchString?: string,
     section?: string
   ) => (PickerComboBoxItem | string)[];
@@ -264,11 +264,7 @@ export class HaPickerComboBox extends ScrollableFadeMixin(LitElement) {
     this.getAdditionalItems?.(searchString) || [];
 
   private _getItems = () => {
-    let items = [
-      ...(this.getItems
-        ? this.getItems(this._search, this.selectedSection)
-        : []),
-    ];
+    let items = [...this.getItems(this._search, this.selectedSection)];
 
     if (!this.sections?.length) {
       items = items.sort((entityA, entityB) =>

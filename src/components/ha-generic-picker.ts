@@ -48,6 +48,9 @@ export class HaGenericPicker extends LitElement {
   @property({ attribute: "hide-clear-icon", type: Boolean })
   public hideClearIcon = false;
 
+  @property({ attribute: "show-label", type: Boolean })
+  public showLabel = false;
+
   /** To prevent lags, getItems needs to be memoized */
   @property({ attribute: false })
   public getItems!: (
@@ -170,6 +173,7 @@ export class HaGenericPicker extends LitElement {
                   @click=${this.open}
                   @clear=${this._clear}
                   .placeholder=${this.placeholder}
+                  .showLabel=${this.showLabel}
                   .value=${this.value}
                   .required=${this.required}
                   .disabled=${this.disabled}

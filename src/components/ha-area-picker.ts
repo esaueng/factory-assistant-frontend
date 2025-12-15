@@ -51,6 +51,9 @@ export class HaAreaPicker extends LitElement {
   @property({ type: Boolean, attribute: "no-add" })
   public noAdd = false;
 
+  @property({ type: Boolean, attribute: "show-label" })
+  public showLabel = false;
+
   /**
    * Show only areas with entities from specific domains.
    * @type {Array}
@@ -365,8 +368,16 @@ export class HaAreaPicker extends LitElement {
   protected render(): TemplateResult {
     const placeholder =
       this.placeholder ?? this.hass.localize("ui.components.area-picker.area");
-
     const valueRenderer = this._computeValueRenderer(this.hass.areas);
+
+    let showLabel = this.showLabel;
+    if (this.value) {
+      const area = this.hass.areas[this.value];
+      if (area) {
+        const { floor } = getAreaContext(area, this.hass.floors);
+        showLabel = !floor && this.showLabel;
+      }
+    }
 
     return html`
       <ha-generic-picker
@@ -379,6 +390,7 @@ export class HaAreaPicker extends LitElement {
         .disabled=${this.disabled}
         .required=${this.required}
         .placeholder=${placeholder}
+        .showLabel=${showLabel}
         .value=${this.value}
         .getItems=${this._getItems}
         .getAdditionalItems=${this._getAdditionalItems}

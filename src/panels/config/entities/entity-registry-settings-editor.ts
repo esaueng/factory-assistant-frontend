@@ -778,6 +778,7 @@ export class EntityRegistrySettingsEditor extends LitElement {
             .hass=${this.hass}
             .value=${this._areaId}
             .disabled=${this.disabled}
+            show-label
             @value-changed=${this._areaPicked}
           ></ha-area-picker>`
         : ""}
@@ -1012,6 +1013,7 @@ export class EntityRegistrySettingsEditor extends LitElement {
               ? html`<ha-area-picker
                   .hass=${this.hass}
                   .value=${this._areaId}
+                  show-label
                   .disabled=${this.disabled}
                   @value-changed=${this._areaPicked}
                 ></ha-area-picker>`

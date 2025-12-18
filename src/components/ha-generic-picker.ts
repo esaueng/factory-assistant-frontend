@@ -99,6 +99,9 @@ export class HaGenericPicker extends PickerMixin(LitElement) {
   @property({ type: Boolean, attribute: "use-top-label" })
   public useTopLabel = false;
 
+  @property({ attribute: "custom-value-label" })
+  public customValueLabel?: string;
+
   @query(".container") private _containerElement?: HTMLDivElement;
 
   @query("ha-picker-combo-box") private _comboBox?: HaPickerComboBox;
@@ -154,7 +157,11 @@ export class HaGenericPicker extends PickerMixin(LitElement) {
                   type="button"
                   class=${this._opened ? "opened" : ""}
                   compact
-                  .unknown=${this._unknownValue(this.value, this.getItems())}
+                  .unknown=${this._unknownValue(
+                    this.allowCustomValue,
+                    this.value,
+                    this.getItems()
+                  )}
                   .unknownItemText=${this.unknownItemText}
                   aria-label=${ifDefined(this.label)}
                   @click=${this.open}
@@ -236,13 +243,24 @@ export class HaGenericPicker extends PickerMixin(LitElement) {
         .sectionTitleFunction=${this.sectionTitleFunction}
         .selectedSection=${this.selectedSection}
         .searchKeys=${this.searchKeys}
+        .customValueLabel=${this.customValueLabel}
       ></ha-picker-combo-box>
     `;
   }
 
   private _unknownValue = memoizeOne(
-    (value?: string, items?: (PickerComboBoxItem | string)[]) => {
-      if (value === undefined || value === null || value === "" || !items) {
+    (
+      allowCustomValue: boolean,
+      value?: string,
+      items?: (PickerComboBoxItem | string)[]
+    ) => {
+      if (
+        allowCustomValue ||
+        value === undefined ||
+        value === null ||
+        value === "" ||
+        !items
+      ) {
         return false;
       }
 

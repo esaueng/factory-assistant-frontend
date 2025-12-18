@@ -74,7 +74,6 @@ export class HaEntitySelector extends LitElement {
         .createDomains=${this._createDomains}
         .disabled=${this.disabled}
         .required=${this.required}
-        allow-custom-entity
       ></ha-entity-picker>`;
     }
 

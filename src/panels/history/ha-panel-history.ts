@@ -631,6 +631,7 @@ class HaPanelHistory extends LitElement {
 
         :host([virtualize]) {
           height: 100%;
+          --ha-generic-picker-max-width: 400px;
         }
 
         .progress-wrapper {

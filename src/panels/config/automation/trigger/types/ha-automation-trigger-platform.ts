@@ -160,9 +160,9 @@ export class HaPlatformTrigger extends LitElement {
 
     const hasOptional = Boolean(
       triggerDesc?.fields &&
-        Object.values(triggerDesc.fields).some((field) =>
-          showOptionalToggle(field)
-        )
+      Object.values(triggerDesc.fields).some((field) =>
+        showOptionalToggle(field)
+      )
     );
 
     return html`
@@ -292,6 +292,7 @@ export class HaPlatformTrigger extends LitElement {
               : undefined}
             .placeholder=${dataField.default}
             .localizeValue=${this._localizeValueCallback}
+            .required=${dataField.required}
           ></ha-selector>
         </ha-settings-row>`
       : nothing;

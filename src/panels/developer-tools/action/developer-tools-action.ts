@@ -1,7 +1,7 @@
 import { mdiHelpCircle } from "@mdi/js";
 import type { HassService } from "home-assistant-js-websocket";
 import { ERR_CONNECTION_LOST } from "home-assistant-js-websocket";
-import { load } from "js-yaml";
+import { dump, load } from "js-yaml";
 import type { CSSResultGroup, TemplateResult } from "lit";
 import { css, html, LitElement, nothing } from "lit";
 import { customElement, property, query, state } from "lit/decorators";
@@ -320,7 +320,10 @@ class HaPanelDevAction extends LitElement {
                         ${this.hass.localize(
                           `component.${domain}.services.${serviceName}.fields.${field.key}.example`,
                           descriptionPlaceholders
-                        ) || field.example}
+                        ) ||
+                        (typeof field.example === "object"
+                          ? html`<pre>${dump(field.example)}</pre>`
+                          : field.example)}
                       </td>
                     </tr>`
                 )}
@@ -670,12 +673,12 @@ class HaPanelDevAction extends LitElement {
       haStyle,
       css`
         .content {
-          padding: 16px;
+          padding: var(--ha-space-4);
           max-width: 1200px;
           margin: auto;
         }
         .button-row {
-          padding: 8px 16px;
+          padding: var(--ha-space-2) var(--ha-space-4);
           border-top: 1px solid var(--divider-color);
           border-bottom: 1px solid var(--divider-color);
           background: var(--card-background-color);
@@ -695,8 +698,8 @@ class HaPanelDevAction extends LitElement {
           align-items: center;
         }
         .switch-mode-container .error {
-          margin-left: 8px;
-          margin-inline-start: 8px;
+          margin-left: var(--ha-space-2);
+          margin-inline-start: var(--ha-space-2);
           margin-inline-end: initial;
         }
         .attributes {
@@ -729,7 +732,7 @@ class HaPanelDevAction extends LitElement {
         }
 
         .attributes td {
-          padding: 4px;
+          padding: var(--ha-space-1);
           vertical-align: middle;
         }
 
@@ -745,7 +748,7 @@ class HaPanelDevAction extends LitElement {
         .response img {
           max-width: 100%;
           height: auto;
-          margin-top: 24px;
+          margin-top: var(--ha-space-6);
         }
       `,
     ];

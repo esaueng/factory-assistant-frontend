@@ -672,8 +672,8 @@
             "device_missing": "No related device"
           },
           "add": "Add",
-          "custom_name": "Custom name",
-          "no_match": "No entities found"
+          "search": "Search or enter custom name",
+          "custom_name": "Custom name"
         },
         "entity-attribute-picker": {
           "attribute": "Attribute",
@@ -685,7 +685,7 @@
         },
         "entity-state-content-picker": {
           "add": "Add",
-          "custom_state": "Custom state"
+          "custom_attribute": "Custom attribute"
         }
       },
       "target-picker": {
@@ -771,9 +771,6 @@
         "language": "Language",
         "no_match": "No languages found for {term}",
         "no_languages": "No languages available"
-      },
-      "icon-picker": {
-        "no_match": "No matching icons found"
       },
       "tts-picker": {
         "tts": "Text-to-speech",

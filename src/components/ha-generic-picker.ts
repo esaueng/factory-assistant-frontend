@@ -1,12 +1,19 @@
 import "@home-assistant/webawesome/dist/components/popover/popover";
 import type { RenderItemFunction } from "@lit-labs/virtualizer/virtualize";
 import { mdiPlaylistPlus } from "@mdi/js";
-import { css, html, LitElement, nothing, type CSSResultGroup } from "lit";
+import {
+  css,
+  html,
+  LitElement,
+  nothing,
+  type CSSResultGroup,
+  type PropertyValues,
+} from "lit";
 import { customElement, property, query, state } from "lit/decorators";
 import { ifDefined } from "lit/directives/if-defined";
-import memoizeOne from "memoize-one";
 import { tinykeys } from "tinykeys";
 import { fireEvent } from "../common/dom/fire_event";
+import { throttle } from "../common/util/throttle";
 import { PickerMixin } from "../mixins/picker-mixin";
 import type { FuseWeightedKey } from "../resources/fuseMultiTerm";
 import type { HomeAssistant } from "../types";
@@ -114,6 +121,8 @@ export class HaGenericPicker extends PickerMixin(LitElement) {
 
   @state() private _openedNarrow = false;
 
+  @state() private _unknownValue = false;
+
   static shadowRootOptions = {
     ...LitElement.shadowRootOptions,
     delegatesFocus: true,
@@ -129,6 +138,16 @@ export class HaGenericPicker extends PickerMixin(LitElement) {
   @property({ type: Boolean, reflect: true }) public invalid = false;
 
   private _unsubscribeTinyKeys?: () => void;
+
+  protected willUpdate(changedProperties: PropertyValues) {
+    if (changedProperties.has("value")) {
+      this._setUnknownValue();
+      return;
+    }
+    if (changedProperties.has("hass")) {
+      this._throttleUnknownValue();
+    }
+  }
 
   public setFieldValue(value: string) {
     if (this._comboBox) {
@@ -166,11 +185,7 @@ export class HaGenericPicker extends PickerMixin(LitElement) {
                   type="button"
                   class=${this._opened ? "opened" : ""}
                   compact
-                  .unknown=${this._unknownValue(
-                    this.allowCustomValue,
-                    this.value,
-                    this.getItems()
-                  )}
+                  .unknown=${this._unknownValue}
                   .unknownItemText=${this.unknownItemText}
                   aria-label=${ifDefined(this.label)}
                   @click=${this.open}
@@ -259,26 +274,29 @@ export class HaGenericPicker extends PickerMixin(LitElement) {
     `;
   }
 
-  private _unknownValue = memoizeOne(
-    (
-      allowCustomValue: boolean,
-      value?: string,
-      items?: (PickerComboBoxItem | string)[]
-    ) => {
-      if (
-        allowCustomValue ||
-        value === undefined ||
-        value === null ||
-        value === "" ||
-        !items
-      ) {
-        return false;
-      }
-
-      return !items.some(
-        (item) => typeof item !== "string" && item.id === value
-      );
+  private _setUnknownValue = () => {
+    const items = this.getItems();
+    if (
+      this.allowCustomValue ||
+      this.value === undefined ||
+      this.value === null ||
+      this.value === "" ||
+      !items
+    ) {
+      this._unknownValue = false;
+      return;
     }
+
+    this._unknownValue = !items.some(
+      (item) => typeof item !== "string" && item.id === this.value
+    );
+  };
+
+  private _throttleUnknownValue = throttle(
+    this._setUnknownValue,
+    1000,
+    true,
+    false
   );
 
   private _renderHelper() {

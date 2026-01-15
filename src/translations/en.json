@@ -1338,6 +1338,8 @@
         "text": "Home Assistant is running in safe mode, custom integrations and frontend modules are not available. Restart Home Assistant to exit safe mode."
       },
       "quick-bar": {
+        "commands_title": "Commands",
+        "navigate_title": "Navigate",
         "commands": {
           "reload": {
             "all": "[%key:ui::panel::developer-tools::tabs::yaml::section::reloading::all%]",
@@ -1423,7 +1425,7 @@
         },
         "filter_placeholder": "Search entities",
         "filter_placeholder_devices": "Search devices",
-        "title": "Quick search",
+        "title": "Search Home Assistant",
         "key_c_tip": "[%key:ui::tips::key_c_tip%]",
         "nothing_found": "Nothing found!"
       },
@@ -2148,6 +2150,7 @@
           "title": "Searching",
           "on_any_page": "On any page",
           "on_pages_with_tables": "On pages with tables",
+          "search": "Search Home Assistant",
           "search_command": "search command",
           "search_entities": "search entities",
           "search_devices": "search devices",
@@ -7485,6 +7488,7 @@
           "search_entities": "Search entities",
           "assist": "Assist",
           "assist_tooltip": "Assist",
+          "search_home_assistant": "Search Home Assistant",
           "reload_resources": "Reload resources",
           "exit_edit_mode": "Done",
           "close": "Close",

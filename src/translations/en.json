@@ -2139,7 +2139,8 @@
         "enable_shortcuts_hint": "For keyboard shortcuts to work, make sure you have them enabled in your {user_profile}.",
         "enable_shortcuts_hint_user_profile": "user profile",
         "keys": {
-          "del": "Del"
+          "del": "Del",
+          "ctrl": "[%key:ui::panel::config::automation::editor::ctrl%]"
         },
         "shortcuts": {
           "double_click": "Double-click",
@@ -2150,7 +2151,7 @@
           "title": "Searching",
           "on_any_page": "On any page",
           "on_pages_with_tables": "On pages with tables",
-          "search": "Search Home Assistant",
+          "search": "Quick search",
           "search_command": "search command",
           "search_entities": "search entities",
           "search_devices": "search devices",

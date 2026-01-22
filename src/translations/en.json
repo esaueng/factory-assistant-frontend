@@ -7524,8 +7524,6 @@
             "empty_state_action": "Go to the integrations page"
           },
           "areas": {
-            "empty_state_title": "No devices",
-            "empty_state_content": "There are no devices assigned to this area yet. Assign devices to this area to see them here.",
             "sensors": "Sensors",
             "sensors_description": "To display temperature and humidity sensors in the overview and in the area view, add a sensor to that area and {edit_the_area} to configure related sensors.",
             "edit_the_area": "edit the area",
@@ -7559,7 +7557,11 @@
             "automations": "Automations",
             "for_you": "For you",
             "home": "Home",
-            "favorites": "Favorites"
+            "favorites": "Favorites",
+            "welcome_title": "No devices here yet",
+            "welcome_content": "Add lights, switches, sensors, or other smart home devices to get started.",
+            "welcome_add_device": "Add new device",
+            "welcome_edit_areas": "Edit areas"
           },
           "common_controls": {
             "not_loaded": "Usage Prediction integration is not loaded.",
@@ -7581,12 +7583,18 @@
             "media_players": "Media players",
             "other_media_players": "Other media players"
           },
-          "other_devices": {
+          "home-other-devices": {
             "helpers": "Helpers",
             "entities": "Entities",
             "assign_area": "Assign area",
-            "empty_state_title": "All devices are organized",
-            "empty_state_content": "There are no unassigned devices left. All devices are organized into areas."
+            "all_organized_title": "All devices are organized",
+            "all_organized_content": "There are no unassigned devices left. All devices are organized into areas."
+          },
+          "home-area": {
+            "no_devices_title": "This is a blank canvas",
+            "no_devices_content": "Add your smart lights, switches, or sensors to this area to get started.",
+            "no_devices_add_device": "Add new device",
+            "no_devices_assign_device": "Assign existing device"
           }
         },
         "cards": {
@@ -8283,14 +8291,14 @@
             },
             "empty_state": {
               "name": "Empty state",
-              "description": "The Empty state card displays a centered message with an optional icon and action button.",
+              "description": "The Empty state card displays a centered message with an optional icon and action buttons.",
               "style": "Style",
               "style_options": {
                 "card": "Card",
                 "content-only": "Content only"
               },
               "content": "Content",
-              "action_text": "Action button text"
+              "buttons": "Buttons"
             },
             "button": {
               "name": "Button",

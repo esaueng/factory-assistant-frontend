@@ -30,7 +30,6 @@ import {
   getPanelIcon,
   getPanelIconPath,
   getPanelTitle,
-  SHOW_AFTER_SPACER_PANELS,
 } from "../data/panel";
 import type { PersistentNotification } from "../data/persistent_notification";
 import { subscribeNotifications } from "../data/persistent_notification";
@@ -58,7 +57,6 @@ const SORT_VALUE_URL_PATHS = {
   map: 2,
   logbook: 3,
   history: 4,
-  "developer-tools": 100,
 };
 
 const panelSorter = (
@@ -135,10 +133,11 @@ export const computePanels = memoizeOne(
     }
 
     const beforeSpacer: PanelInfo[] = [];
-    const afterSpacer: PanelInfo[] = [];
 
     const allPanels = Object.values(panels).filter(
-      (panel) => !FIXED_PANELS.includes(panel.url_path)
+      (panel) =>
+        !FIXED_PANELS.includes(panel.url_path) &&
+        panel.url_path !== "developer-tools"
     );
 
     allPanels.forEach((panel) => {
@@ -153,10 +152,7 @@ export const computePanels = memoizeOne(
       ) {
         return;
       }
-      (SHOW_AFTER_SPACER_PANELS.includes(panel.url_path)
-        ? afterSpacer
-        : beforeSpacer
-      ).push(panel);
+      beforeSpacer.push(panel);
     });
 
     const reverseSort = [...panelsOrder].reverse();
@@ -164,11 +160,8 @@ export const computePanels = memoizeOne(
     beforeSpacer.sort((a, b) =>
       panelSorter(reverseSort, defaultPanel, a, b, locale.language)
     );
-    afterSpacer.sort((a, b) =>
-      panelSorter(reverseSort, defaultPanel, a, b, locale.language)
-    );
 
-    return [beforeSpacer, afterSpacer];
+    return [beforeSpacer, []];
   }
 );
 

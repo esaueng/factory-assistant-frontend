@@ -2,6 +2,7 @@ import { mdiDotsVertical } from "@mdi/js";
 import type { CSSResultGroup, TemplateResult } from "lit";
 import { css, html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators";
+import { classMap } from "lit/directives/class-map";
 import { goBack, navigate } from "../../common/navigate";
 import "../../components/ha-dropdown";
 import "../../components/ha-dropdown-item";
@@ -30,7 +31,7 @@ class PanelDeveloperTools extends LitElement {
   protected render(): TemplateResult {
     const page = this._page;
     return html`
-      <div class="header">
+      <div class="header ${classMap({ narrow: this.narrow })}">
         <div class="toolbar">
           <ha-icon-button-arrow-prev
             slot="navigationIcon"
@@ -188,9 +189,12 @@ class PanelDeveloperTools extends LitElement {
           padding: var(--ha-space-1);
         }
         .main-title {
-          margin: var(--margin-title);
+          margin-inline-start: var(--ha-space-6);
           line-height: var(--ha-line-height-normal);
           flex-grow: 1;
+        }
+        .narrow .main-title {
+          margin-inline-start: var(--ha-space-2);
         }
         developer-tools-router {
           display: block;

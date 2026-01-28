@@ -1310,7 +1310,9 @@
         "error_location": "line: {line}, column: {column}",
         "enter_fullscreen": "Enter fullscreen",
         "exit_fullscreen": "Exit fullscreen",
-        "find_and_replace": "Find and replace"
+        "find_and_replace": "Find and replace",
+        "test_on": "Turn on testing",
+        "test_off": "Turn off testing"
       },
       "state-content-picker": {
         "state": "State",

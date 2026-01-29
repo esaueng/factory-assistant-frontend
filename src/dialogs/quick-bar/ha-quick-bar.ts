@@ -170,7 +170,7 @@ export class QuickBar extends LitElement {
   // #region render
 
   protected render() {
-    if (!this._open) {
+    if (!this._open && !this._opened) {
       return nothing;
     }
 

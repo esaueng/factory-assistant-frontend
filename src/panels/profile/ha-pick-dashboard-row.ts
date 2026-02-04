@@ -1,9 +1,10 @@
 import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
 import { css, html, LitElement, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators";
+import memoizeOne from "memoize-one";
 import "../../components/ha-divider";
+import "../../components/ha-dropdown-item";
 import "../../components/ha-icon";
-import "../../components/ha-list-item";
 import "../../components/ha-select";
 import "../../components/ha-settings-row";
 import "../../components/ha-spinner";
@@ -46,13 +47,15 @@ class HaPickDashboardRow extends LitElement {
                 .label=${this.hass.localize(
                   "ui.panel.profile.dashboard.dropdown_label"
                 )}
-                .value=${value}
+                .value=${this._valueLabel(value)}
                 @selected=${this._dashboardChanged}
-                naturalMenuWidth
               >
-                <ha-list-item .value=${USE_SYSTEM_VALUE}>
+                <ha-dropdown-item
+                  .value=${USE_SYSTEM_VALUE}
+                  class=${value === USE_SYSTEM_VALUE ? "selected" : ""}
+                >
                   ${this.hass.localize("ui.panel.profile.dashboard.system")}
-                </ha-list-item>
+                </ha-dropdown-item>
                 <ha-divider></ha-divider>
                 ${PANEL_DASHBOARDS.map((panel) => {
                   const panelInfo = this.hass.panels[panel] as
@@ -62,13 +65,16 @@ class HaPickDashboardRow extends LitElement {
                     return nothing;
                   }
                   return html`
-                    <ha-list-item value=${panelInfo.url_path} graphic="icon">
+                    <ha-dropdown-item
+                      value=${panelInfo.url_path}
+                      class=${value === panelInfo.url_path ? "selected" : ""}
+                    >
                       <ha-icon
-                        slot="graphic"
+                        slot="icon"
                         .icon=${getPanelIcon(panelInfo)}
                       ></ha-icon>
                       ${getPanelTitle(this.hass, panelInfo)}
-                    </ha-list-item>
+                    </ha-dropdown-item>
                   `;
                 })}
                 ${this._dashboards.length
@@ -82,16 +88,18 @@ class HaPickDashboardRow extends LitElement {
                           return "";
                         }
                         return html`
-                          <ha-list-item
+                          <ha-dropdown-item
                             .value=${dashboard.url_path}
-                            graphic="icon"
+                            class=${value === dashboard.url_path
+                              ? "selected"
+                              : ""}
                           >
                             <ha-icon
-                              slot="graphic"
+                              slot="icon"
                               .icon=${dashboard.icon || "mdi:view-dashboard"}
                             ></ha-icon>
                             ${dashboard.title}
-                          </ha-list-item>
+                          </ha-dropdown-item>
                         `;
                       })}
                     `
@@ -109,8 +117,8 @@ class HaPickDashboardRow extends LitElement {
     this._dashboards = await fetchDashboards(this.hass);
   }
 
-  private _dashboardChanged(ev) {
-    const value = ev.target.value as string;
+  private _dashboardChanged(ev: CustomEvent<{ value: string }>): void {
+    const value = ev.detail.value;
     if (!value) {
       return;
     }
@@ -124,6 +132,24 @@ class HaPickDashboardRow extends LitElement {
     });
   }
 
+  private _valueLabel = memoizeOne((value: string) => {
+    if (value === USE_SYSTEM_VALUE) {
+      return this.hass.localize("ui.panel.profile.dashboard.system");
+    }
+    if (value === "lovelace") {
+      return this.hass.localize("ui.panel.profile.dashboard.lovelace");
+    }
+    const panelInfo = this.hass.panels[value] as PanelInfo | undefined;
+    if (panelInfo) {
+      return getPanelTitle(this.hass, panelInfo);
+    }
+    const dashboard = this._dashboards?.find((dash) => dash.url_path === value);
+    if (dashboard) {
+      return dashboard.title;
+    }
+    return value;
+  });
+
   static get styles(): CSSResultGroup {
     return [
       css`
@@ -133,6 +159,11 @@ class HaPickDashboardRow extends LitElement {
           align-items: center;
           height: 56px;
           width: 200px;
+        }
+
+        ha-select {
+          display: block;
+          width: 100%;
         }
       `,
     ];

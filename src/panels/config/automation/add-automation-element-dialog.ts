@@ -2291,7 +2291,14 @@ class DialogAddAutomationElement
 
       if (targetId) {
         return getTargetText(
-          this.hass,
+          {
+            entities: this.hass.entities,
+            devices: this.hass.devices,
+            areas: this.hass.areas,
+            floors: this.hass.floors,
+          },
+          this.hass.states,
+          this.hass.localize,
           targetType as "floor" | "area" | "device" | "entity" | "label",
           targetId,
           this._getLabel

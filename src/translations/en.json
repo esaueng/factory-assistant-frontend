@@ -1675,7 +1675,6 @@
         "back_to_info": "Back to info",
         "info": "Information",
         "related": "Related",
-        "add_entity_to": "Add to",
         "attributes": "Attributes",
         "history": "History",
         "aggregate": "5-minute aggregated",
@@ -1694,11 +1693,13 @@
           "last_triggered": "Last triggered"
         },
         "add_to": {
+          "title": "Add to",
           "actions": {
-            "automation_trigger": "Create new automation using {entity} as a trigger",
-            "automation_condition": "Create new automation using {entity} as a condition",
-            "automation_action": "Create new automation using {entity} in an action",
-            "script_action": "Create new script using {entity} in an action"
+            "automation_trigger": "Create new automation using {target} as a trigger",
+            "automation_condition": "Create new automation using {target} as a condition",
+            "automation_action": "Create new automation using {target} in an action",
+            "script_action": "Create new script using {target} in an action",
+            "scene": "Create new scene using {target}"
           },
           "app_actions": "App actions",
           "no_actions": "No actions available",
@@ -6495,6 +6496,8 @@
             "service": "service"
           },
           "automation": {
+            "related_heading": "Related",
+            "automations_scripts_or_scenes": "automations, scripts or scenes",
             "automations_heading": "Automations",
             "automations": "automations",
             "no_automations": "No automations",
@@ -6506,24 +6509,18 @@
               "description": "Start with an empty automation from scratch"
             },
             "triggers": {
-              "title": "Use device as trigger",
-              "description": "When something happens to the device",
               "no_triggers": "No triggers",
               "unknown_trigger": "Unknown trigger"
             },
             "conditions": {
-              "title": "Use device as condition",
-              "description": "Only if a condition is met for the device",
               "no_conditions": "No conditions",
               "unknown_condition": "Unknown condition"
             },
             "actions": {
-              "title": "Use device as action",
-              "description": "Do something on the device",
               "no_actions": "No actions",
               "unknown_action": "Unknown action"
             },
-            "no_device_automations": "There are no automations available for this device."
+            "no_device_automations": "There are no automations, scripts or scenes available for this device."
           },
           "script": {
             "scripts_heading": "Scripts",
@@ -6534,10 +6531,6 @@
             "new": {
               "title": "Create new script",
               "description": "Start with an empty script from scratch"
-            },
-            "actions": {
-              "title": "Use device as action",
-              "description": "Do something on this device."
             }
           },
           "scene": {

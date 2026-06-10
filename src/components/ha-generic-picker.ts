@@ -77,7 +77,7 @@ export class HaGenericPicker extends PickerMixin(LitElement) {
     | "bottom-start"
     | "bottom-end"
     | "left-start"
-    | "left-end" = "bottom-start";
+    | "left-end" = "bottom";
 
   /** If set picker shows an add button instead of textbox when value isn't set */
   @property({ attribute: "add-button-label" }) public addButtonLabel?: string;
@@ -174,7 +174,7 @@ export class HaGenericPicker extends PickerMixin(LitElement) {
           <slot name="field">
             ${this.addButtonLabel && !this.value
               ? html`<ha-button
-                  size="small"
+                  size="s"
                   appearance="filled"
                   @click=${this.open}
                   .disabled=${this.disabled}

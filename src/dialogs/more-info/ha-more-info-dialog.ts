@@ -23,6 +23,7 @@ import { customElement, property, query, state } from "lit/decorators";
 import { cache } from "lit/directives/cache";
 import { classMap } from "lit/directives/class-map";
 import { keyed } from "lit/directives/keyed";
+import type { RequestSelectedDetail } from "@material/mwc-list/mwc-list-item";
 import { dynamicElement } from "../../common/dom/dynamic-element-directive";
 import type { HASSDomEvent } from "../../common/dom/fire_event";
 import { fireEvent } from "../../common/dom/fire_event";
@@ -62,6 +63,9 @@ import { subscribeLabFeature } from "../../data/labs";
 import type { ItemType } from "../../data/search";
 import { SearchableDomains } from "../../data/search";
 import { getSensorNumericDeviceClasses } from "../../data/sensor";
+import { DirtyStateProviderMixin } from "../../mixins/dirty-state-provider-mixin";
+import type { EntitySettingsState } from "../../panels/config/entities/entity-registry-settings-editor";
+import type { Helper } from "../../panels/config/helpers/const";
 import { ScrollableFadeMixin } from "../../mixins/scrollable-fade-mixin";
 import { SubscribeMixin } from "../../mixins/subscribe-mixin";
 import {
@@ -120,9 +124,10 @@ declare global {
 const DEFAULT_VIEW: MoreInfoView = "info";
 
 @customElement("ha-more-info-dialog")
-export class MoreInfoDialog extends SubscribeMixin(
-  ScrollableFadeMixin(LitElement)
-) {
+export class MoreInfoDialog extends DirtyStateProviderMixin<
+  EntitySettingsState | Helper | Record<string, string[]> | null,
+  "entity-registry" | "helper" | "vacuum-segment-mapping"
+>()(SubscribeMixin(ScrollableFadeMixin(LitElement))) {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
   @property({ type: Boolean, reflect: true }) public large = false;
@@ -517,7 +522,7 @@ export class MoreInfoDialog extends SubscribeMixin(
     await favoritesHandler.copy(favoritesContext);
   }
 
-  private _goToAddEntityTo(ev) {
+  private _goToAddEntityTo(ev: CustomEvent<RequestSelectedDetail>) {
     // Only check for request-selected events (from menu items), not regular clicks (from icon button)
     if (
       ev.type === "request-selected" &&
@@ -590,10 +595,19 @@ export class MoreInfoDialog extends SubscribeMixin(
       (v): v is string => Boolean(v)
     );
     const defaultTitle = breadcrumb.pop() || entityId;
+    const addToTitle = this.hass.localize(
+      "ui.dialogs.more_info_control.add_to.title",
+      { target: defaultTitle }
+    );
+    const addToMenuItem = this.hass.localize(
+      "ui.dialogs.more_info_control.add_to.item"
+    );
     const title =
       this._currView === "details"
         ? this.hass.localize("ui.dialogs.more_info_control.details")
-        : this._childView?.viewTitle || defaultTitle;
+        : this._currView === "add_to"
+          ? addToTitle
+          : this._childView?.viewTitle || defaultTitle;
 
     const favoritesContext =
       this._entry && stateObj
@@ -623,6 +637,18 @@ export class MoreInfoDialog extends SubscribeMixin(
       this.hass.translationMetadata.translations
     );
 
+    const childViewContent = this._childView
+      ? html`
+          <div class="child-view">
+            ${dynamicElement(this._childView.viewTag, {
+              hass: this.hass,
+              entry: this._entry,
+              params: this._childView.viewParams,
+            })}
+          </div>
+        `
+      : nothing;
+
     return html`
       <ha-adaptive-dialog
         .open=${this._open}
@@ -630,7 +656,9 @@ export class MoreInfoDialog extends SubscribeMixin(
         @closed=${this._dialogClosed}
         @opened=${this._handleOpened}
         @show-child-view=${this._showChildView}
-        .preventScrimClose=${this._currView === "settings" ||
+        .preventScrimClose=${((this._currView === "settings" ||
+          this._childView) &&
+          this.isDirtyState) ||
         !this._isEscapeEnabled}
         flexcontent
       >
@@ -711,9 +739,7 @@ export class MoreInfoDialog extends SubscribeMixin(
                                 slot="icon"
                                 .path=${mdiPlusBoxMultipleOutline}
                               ></ha-svg-icon>
-                              ${this.hass.localize(
-                                "ui.dialogs.more_info_control.add_to.title"
-                              )}
+                              ${addToMenuItem}
                             </ha-dropdown-item>
 
                             <wa-divider></wa-divider>
@@ -814,9 +840,7 @@ export class MoreInfoDialog extends SubscribeMixin(
                   ? html`
                       <ha-icon-button
                         slot="headerActionItems"
-                        .label=${this.hass.localize(
-                          "ui.dialogs.more_info_control.add_to.title"
-                        )}
+                        .label=${addToMenuItem}
                         .path=${mdiPlusBoxMultipleOutline}
                         @click=${this._goToAddEntityTo}
                       ></ha-icon-button>
@@ -857,71 +881,65 @@ export class MoreInfoDialog extends SubscribeMixin(
                 @toggle-edit-mode=${this._handleToggleInfoEditModeEvent}
                 @hass-more-info=${this._handleMoreInfoEvent}
               >
-                ${cache(
-                  this._childView
-                    ? html`
-                        <div class="child-view">
-                          ${dynamicElement(this._childView.viewTag, {
-                            hass: this.hass,
-                            entry: this._entry,
-                            params: this._childView.viewParams,
-                          })}
-                        </div>
-                      `
-                    : this._currView === "info"
-                      ? html`
-                          <ha-more-info-info
-                            .hass=${this.hass}
-                            .entityId=${this._entityId}
-                            .entry=${this._entry}
-                            .editMode=${this._infoEditMode}
-                            .data=${this._data}
-                          ></ha-more-info-info>
-                        `
-                      : this._currView === "history"
-                        ? html`
-                            <ha-more-info-history-and-logbook
-                              .hass=${this.hass}
-                              .entityId=${this._entityId}
-                            ></ha-more-info-history-and-logbook>
-                          `
-                        : this._currView === "settings"
+                ${this._currView === "settings"
+                  ? html`
+                      <div ?hidden=${!!this._childView}>
+                        <ha-more-info-settings
+                          .hass=${this.hass}
+                          .entityId=${this._entityId}
+                          .entry=${this._entry}
+                        ></ha-more-info-settings>
+                      </div>
+                      ${childViewContent}
+                    `
+                  : cache(
+                      this._childView
+                        ? childViewContent
+                        : this._currView === "info"
                           ? html`
-                              <ha-more-info-settings
+                              <ha-more-info-info
                                 .hass=${this.hass}
                                 .entityId=${this._entityId}
                                 .entry=${this._entry}
-                              ></ha-more-info-settings>
+                                .editMode=${this._infoEditMode}
+                                .data=${this._data}
+                              ></ha-more-info-info>
                             `
-                          : this._currView === "related"
+                          : this._currView === "history"
                             ? html`
-                                <ha-related-items
+                                <ha-more-info-history-and-logbook
                                   .hass=${this.hass}
-                                  .itemId=${entityId}
-                                  .itemType=${SearchableDomains.has(domain)
-                                    ? (domain as ItemType)
-                                    : "entity"}
-                                ></ha-related-items>
+                                  .entityId=${this._entityId}
+                                ></ha-more-info-history-and-logbook>
                               `
-                            : this._currView === "add_to"
+                            : this._currView === "related"
                               ? html`
-                                  <ha-more-info-add-to
+                                  <ha-related-items
                                     .hass=${this.hass}
-                                    .entityId=${entityId}
-                                    @add-to-action-selected=${this._goBack}
-                                  ></ha-more-info-add-to>
+                                    .itemId=${entityId}
+                                    .itemType=${SearchableDomains.has(domain)
+                                      ? (domain as ItemType)
+                                      : "entity"}
+                                  ></ha-related-items>
                                 `
-                              : this._currView === "details"
+                              : this._currView === "add_to"
                                 ? html`
-                                    <ha-more-info-details
-                                      .hass=${this.hass}
-                                      .entry=${this._entry}
-                                      .params=${{ entityId }}
-                                      .yamlMode=${this._detailsYamlMode}
-                                    ></ha-more-info-details>
+                                    <ha-more-info-add-to
+                                      .entityId=${entityId}
+                                      @add-to-action-selected=${this._goBack}
+                                    ></ha-more-info-add-to>
                                   `
-                                : nothing
-                )}
+                                : this._currView === "details"
+                                  ? html`
+                                      <ha-more-info-details
+                                        .hass=${this.hass}
+                                        .entry=${this._entry}
+                                        .params=${{ entityId }}
+                                        .yamlMode=${this._detailsYamlMode}
+                                      ></ha-more-info-details>
+                                    `
+                                  : nothing
+                    )}
               </div>
             `
           )}
@@ -944,11 +962,21 @@ export class MoreInfoDialog extends SubscribeMixin(
       | MoreInfoView
       | undefined;
 
+    if (previousView === "settings" && this._currView !== "settings") {
+      this._discardDirtyStateChanges();
+    }
+
     if (previousView === "details" && this._currView !== "details") {
       const dialog =
         this._dialogElement?.shadowRoot?.querySelector("ha-dialog");
       if (dialog) {
         fireEvent(dialog as HTMLElement, "dialog-set-fullscreen", false);
+      }
+    }
+
+    if (changedProps.has("_currView") || changedProps.has("_entry")) {
+      if (this._currView === "settings" && this._entry) {
+        this._initDirtyTracking({ type: "deep" });
       }
     }
 

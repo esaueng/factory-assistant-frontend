@@ -22,6 +22,10 @@ import { customElement, property, state } from "lit/decorators";
 import { ifDefined } from "lit/directives/if-defined";
 import memoizeOne from "memoize-one";
 import { isComponentLoaded } from "../../../common/config/is_component_loaded";
+import {
+  fireEvent,
+  type HASSDomCurrentTargetEvent,
+} from "../../../common/dom/fire_event";
 import { computeDeviceNameDisplay } from "../../../common/entity/compute_device_name";
 import { computeDomain } from "../../../common/entity/compute_domain";
 import { computeStateName } from "../../../common/entity/compute_state_name";
@@ -33,7 +37,6 @@ import { afterNextRender } from "../../../common/util/render-status";
 import "../../../components/ha-button";
 import "../../../components/ha-card";
 import "../../../components/ha-dropdown";
-import type { HASSDomCurrentTargetEvent } from "../../../common/dom/fire_event";
 import type { HaDropdownSelectEvent } from "../../../components/ha-dropdown";
 import "../../../components/ha-dropdown-item";
 import "../../../components/ha-icon-button";
@@ -60,6 +63,7 @@ import type { SceneEntity } from "../../../data/scene";
 import type { ScriptEntity } from "../../../data/script";
 import type { RelatedResult } from "../../../data/search";
 import { findRelated } from "../../../data/search";
+import { filterAddToSceneEntityIds } from "../../../dialogs/add-to/add-to";
 import { showConfirmationDialog } from "../../../dialogs/generic/show-dialog-box";
 import { showMoreInfoDialog } from "../../../dialogs/more-info/show-ha-more-info-dialog";
 import "../../../layouts/hass-error-screen";
@@ -144,8 +148,6 @@ class HaConfigAreaPage extends SubscribeMixin(LitElement) {
   @property({ type: Boolean, reflect: true }) public narrow = false;
 
   @property({ attribute: "is-wide", type: Boolean }) public isWide = false;
-
-  @property({ attribute: false }) public showAdvanced = false;
 
   @state()
   @consume({ context: fullEntitiesContext, subscribe: true })
@@ -241,6 +243,10 @@ class HaConfigAreaPage extends SubscribeMixin(LitElement) {
     super.updated(changedProps);
     if (changedProps.has("areaId")) {
       this._findRelated();
+      fireEvent(this, "hass-related-context", {
+        itemType: "area",
+        itemId: this.areaId,
+      });
     }
   }
 
@@ -441,7 +447,7 @@ class HaConfigAreaPage extends SubscribeMixin(LitElement) {
                           .path=${mdiPlus}
                         ></ha-svg-icon>
                         ${this.hass.localize(
-                          "ui.dialogs.more_info_control.add_to.title"
+                          "ui.dialogs.more_info_control.add_to.item"
                         )}
                       </ha-button>`
                     : nothing}
@@ -783,9 +789,17 @@ class HaConfigAreaPage extends SubscribeMixin(LitElement) {
     if (!area) {
       return;
     }
+    const sceneEntityIds = filterAddToSceneEntityIds(
+      this._areaEntityIds,
+      this._entityReg,
+      this.hass.states
+    );
     showAreaAddToDialog(this, {
       areaId: area.area_id,
-      entityIds: this._areaEntityIds,
+      entityIds: sceneEntityIds,
+      canCreateScene:
+        isComponentLoaded(this.hass.config, "scene") &&
+        sceneEntityIds.length > 0,
     });
   }
 

@@ -62,19 +62,17 @@ export class HuiCardPicker extends LitElement {
 
   @state() private _filter = "";
 
-  @query("ha-input-search") private _searchInput?: HTMLElement;
+  @query("ha-input-search") private _searchInput?: HaInputSearch;
 
   private _unusedEntities?: string[];
 
   private _usedEntities?: string[];
 
   public async focus(): Promise<void> {
-    if (this._searchInput) {
-      this._searchInput.focus();
-    } else {
-      await this.updateComplete;
-      this.focus();
-    }
+    await this.updateComplete;
+    // Wait for the input's inner wa-input to render so focus delegation works.
+    await this._searchInput?.updateComplete;
+    this._searchInput?.focus();
   }
 
   private _filterCards = memoizeOne(
@@ -91,6 +89,7 @@ export class HuiCardPicker extends LitElement {
         minMatchCharLength: Math.min(filter.length, 2),
         threshold: 0.2,
         ignoreDiacritics: true,
+        ignoreLocation: true,
       };
       const fuse = new Fuse(cards, options);
       cards = fuse.search(filter).map((result) => result.item);
@@ -286,7 +285,7 @@ export class HuiCardPicker extends LitElement {
   protected updated(changedProps: PropertyValues) {
     super.updated(changedProps);
     if (changedProps.has("_filter")) {
-      const div = this.parentElement!.shadowRoot!.getElementById("content");
+      const div = this.shadowRoot!.getElementById("content");
       if (div) {
         div.scrollTo({ behavior: "auto", top: 0 });
       }

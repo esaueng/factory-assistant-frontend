@@ -86,6 +86,7 @@ import { domainToName } from "../../../data/integration";
 import { regenerateEntityIds } from "../../../data/regenerate_entity_ids";
 import type { RelatedResult } from "../../../data/search";
 import { findRelated } from "../../../data/search";
+import { filterAddToSceneEntityIds } from "../../../dialogs/add-to/add-to";
 import {
   showAlertDialog,
   showConfirmationDialog,
@@ -187,8 +188,6 @@ export class HaConfigDevicePage extends LitElement {
   @property({ type: Boolean, reflect: true }) public narrow = false;
 
   @property({ attribute: "is-wide", type: Boolean }) public isWide = false;
-
-  @property({ attribute: false }) public showAdvanced = false;
 
   @state() private _related?: RelatedResult;
 
@@ -381,7 +380,7 @@ export class HaConfigDevicePage extends LitElement {
     if (changedProps.has("deviceId")) {
       this._findRelated();
       // Broadcast device context for quick bar
-      fireEvent(this, "hass-quick-bar-context", {
+      fireEvent(this, "hass-related-context", {
         itemType: "device",
         itemId: this.deviceId,
       });
@@ -425,6 +424,11 @@ export class HaConfigDevicePage extends LitElement {
       this.deviceId,
       this._entityReg,
       this.hass.devices
+    );
+    const sceneEntityIds = filterAddToSceneEntityIds(
+      this._entityIds(entities),
+      this._entityReg,
+      this.hass.states
     );
     const entitiesByCategory = this._entitiesByCategory(entities);
     const quickLinkCounts = this._getQuickLinkCounts(entities, this._related);
@@ -515,7 +519,7 @@ export class HaConfigDevicePage extends LitElement {
               <div class="card-actions" slot="actions">
                 <ha-button
                   variant="warning"
-                  size="small"
+                  size="s"
                   @click=${this._enableDevice}
                 >
                   ${this.hass.localize("ui.common.enable")}
@@ -533,7 +537,7 @@ export class HaConfigDevicePage extends LitElement {
       : this.hass.localize("ui.panel.config.devices.add_prompt_enabled");
 
     const hasSceneSupport =
-      isComponentLoaded(this.hass.config, "scene") && entities.length;
+      isComponentLoaded(this.hass.config, "scene") && sceneEntityIds.length;
 
     const relatedCard =
       isComponentLoaded(this.hass.config, "automation") ||
@@ -553,7 +557,7 @@ export class HaConfigDevicePage extends LitElement {
                 >
                   <ha-svg-icon slot="start" .path=${mdiPlus}></ha-svg-icon>
                   ${this.hass.localize(
-                    "ui.dialogs.more_info_control.add_to.title"
+                    "ui.dialogs.more_info_control.add_to.item"
                   )}
                 </ha-button>
               </h1>
@@ -1368,10 +1372,18 @@ export class HaConfigDevicePage extends LitElement {
       this._entityReg,
       this.hass.devices
     ).map((entity) => entity.entity_id);
+    const sceneEntityIds = filterAddToSceneEntityIds(
+      entityIds,
+      this._entityReg,
+      this.hass.states
+    );
     showDeviceAddToDialog(this, {
       device,
       newTriggersConditions: this._newTriggersConditions,
-      entityIds,
+      entityIds: sceneEntityIds,
+      canCreateScene:
+        isComponentLoaded(this.hass.config, "scene") &&
+        sceneEntityIds.length > 0,
     });
   }
 

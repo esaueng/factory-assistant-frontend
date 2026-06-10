@@ -203,7 +203,7 @@ class HUIRoot extends LitElement {
           </ha-tooltip>
           <ha-button
             appearance="filled"
-            size="small"
+            size="s"
             class="exit-edit-mode"
             @click=${this._editModeDisable}
           >
@@ -488,7 +488,6 @@ class HUIRoot extends LitElement {
             ${this._editMode
               ? html`
                   <ha-icon-button-arrow-prev
-                    .hass=${this.hass}
                     .label=${this.hass!.localize(
                       "ui.panel.lovelace.editor.edit_view.move_left"
                     )}
@@ -523,7 +522,6 @@ class HUIRoot extends LitElement {
                     @click=${this._editView}
                   ></ha-icon-button>
                   <ha-icon-button-arrow-next
-                    .hass=${this.hass}
                     .label=${this.hass!.localize(
                       "ui.panel.lovelace.editor.edit_view.move_right"
                     )}
@@ -572,7 +570,6 @@ class HUIRoot extends LitElement {
                     ${isSubview || this.backButton
                       ? html`
                           <ha-icon-button-arrow-prev
-                            .hass=${this.hass}
                             slot="navigationIcon"
                             @click=${this._goBack}
                           ></ha-icon-button-arrow-prev>
@@ -580,8 +577,6 @@ class HUIRoot extends LitElement {
                       : html`
                           <ha-menu-button
                             slot="navigationIcon"
-                            .hass=${this.hass}
-                            .narrow=${this.narrow}
                           ></ha-menu-button>
                         `}
                     ${isSubview
@@ -1105,11 +1100,11 @@ class HUIRoot extends LitElement {
     const lovelace = this.lovelace!;
     const oldIndex = this._curView as number;
     const newIndex = (this._curView as number) - 1;
-    this._curView = newIndex;
     if (!this.config.views[oldIndex].path) {
       this._navigateToView(newIndex, true);
     }
     lovelace.saveConfig(swapView(lovelace.config, oldIndex, newIndex));
+    this._selectView(newIndex);
   }
 
   private _moveViewRight(ev) {
@@ -1120,11 +1115,11 @@ class HUIRoot extends LitElement {
     const lovelace = this.lovelace!;
     const oldIndex = this._curView as number;
     const newIndex = (this._curView as number) + 1;
-    this._curView = newIndex;
     if (!this.config.views[oldIndex].path) {
       this._navigateToView(newIndex, true);
     }
     lovelace.saveConfig(swapView(lovelace.config, oldIndex, newIndex));
+    this._selectView(newIndex);
   }
 
   private _addView() {
@@ -1355,6 +1350,13 @@ class HUIRoot extends LitElement {
           white-space: nowrap;
           display: flex;
           align-items: center;
+        }
+        .edit-mode .action-items ha-icon-button[disabled] {
+          --ha-color-on-disabled-quiet: color-mix(
+            in srgb,
+            var(--app-header-edit-text-color, #fff) 50%,
+            transparent
+          );
         }
         ha-tab-group {
           --ha-tab-indicator-color: var(

@@ -41,6 +41,7 @@ import { handleStructError } from "../../../../common/structs/handle-errors";
 import { copyToClipboard } from "../../../../common/util/copy-clipboard";
 import "../../../../components/automation/ha-automation-row";
 import type { HaAutomationRow } from "../../../../components/automation/ha-automation-row";
+import "../../../../components/automation/ha-automation-condition-live-test";
 import "../../../../components/automation/ha-automation-row-event-chip";
 import "../../../../components/ha-card";
 import "../../../../components/ha-dropdown";
@@ -297,8 +298,8 @@ export default class HaAutomationActionRow extends LitElement {
             ?.target
         : undefined;
 
-    const commentTooltipText = truncateWithEllipsis(
-      this.action.comment?.trim() || "",
+    const noteTooltipText = truncateWithEllipsis(
+      this.action.note?.trim() || "",
       250
     );
 
@@ -312,13 +313,27 @@ export default class HaAutomationActionRow extends LitElement {
               .service=${this.action.action}
             ></ha-service-icon>
           `
-        : html`
-            <ha-svg-icon
+        : type === "condition" &&
+            this.optionsInSidebar &&
+            (this.action as Condition).condition !== "trigger"
+          ? html`<ha-automation-condition-live-test
+              id="condition-icon"
               slot="leading-icon"
-              class="action-icon"
-              .path=${ACTION_ICONS[type!]}
-            ></ha-svg-icon>
-          `}
+              .hass=${this.hass}
+              .condition=${this.action as Condition}
+            >
+              <ha-svg-icon
+                class="action-icon"
+                .path=${ACTION_ICONS[type]}
+              ></ha-svg-icon>
+            </ha-automation-condition-live-test>`
+          : html`
+              <ha-svg-icon
+                slot="leading-icon"
+                class="action-icon"
+                .path=${ACTION_ICONS[type!]}
+              ></ha-svg-icon>
+            `}
       <h3 slot="header">
         ${capitalizeFirstLetter(
           describeAction(
@@ -334,21 +349,23 @@ export default class HaAutomationActionRow extends LitElement {
           ? this._renderTargets(
               target,
               actionHasTarget && !this._isNew,
-              serviceTargetSpec
+              serviceTargetSpec,
+              type !== "device_id"
             )
           : nothing}
-        ${commentTooltipText
+        ${noteTooltipText
           ? html`
               <ha-svg-icon
-                id="comment-icon"
+                id="note-icon"
+                tabindex="0"
                 .path=${mdiCommentTextOutline}
                 .label=${this.hass.localize(
-                  "ui.panel.config.automation.editor.comment.label"
+                  "ui.panel.config.automation.editor.note.label"
                 )}
-                class="comment-indicator"
+                class="note-indicator"
               ></ha-svg-icon
-              ><ha-tooltip for="comment-icon"
-                ><p>${commentTooltipText}</p></ha-tooltip
+              ><ha-tooltip for="note-icon"
+                ><p>${noteTooltipText}</p></ha-tooltip
               >
             `
           : nothing}
@@ -407,11 +424,11 @@ export default class HaAutomationActionRow extends LitElement {
             )
           )}
         </ha-dropdown-item>
-        <ha-dropdown-item value="edit_comment">
+        <ha-dropdown-item value="edit_note">
           <ha-svg-icon slot="icon" .path=${mdiCommentEditOutline}></ha-svg-icon>
           ${this._renderOverflowLabel(
             this.hass.localize(
-              `ui.panel.config.automation.editor.comment.${this.action.comment ? "edit" : "add"}`
+              `ui.panel.config.automation.editor.note.${this.action.note ? "edit" : "add"}`
             )
           )}
         </ha-dropdown-item>
@@ -721,13 +738,14 @@ export default class HaAutomationActionRow extends LitElement {
     (
       target?: HassServiceTarget,
       targetRequired = false,
-      targetSpec?: TargetSelector["target"]
+      targetSpec?: TargetSelector["target"],
+      interactive = false
     ) =>
       html`<ha-automation-row-targets
-        .hass=${this.hass}
         .target=${target}
         .targetRequired=${targetRequired}
         .selector=${targetSpec ? { target: targetSpec } : undefined}
+        .interactive=${interactive}
       ></ha-automation-row-targets>`
   );
 
@@ -941,25 +959,25 @@ export default class HaAutomationActionRow extends LitElement {
     }
   };
 
-  private _editCommentAction = async (): Promise<void> => {
-    const comment = await showPromptDialog(this, {
+  private _editNoteAction = async (): Promise<void> => {
+    const note = await showPromptDialog(this, {
       title: this.hass.localize(
-        `ui.panel.config.automation.editor.comment.${this.action.comment ? "edit" : "add"}`
+        `ui.panel.config.automation.editor.note.${this.action.note ? "edit" : "add"}`
       ),
       inputLabel: this.hass.localize(
-        "ui.panel.config.automation.editor.comment.label"
+        "ui.panel.config.automation.editor.note.label"
       ),
       inputType: "string",
-      defaultValue: this.action.comment,
+      defaultValue: this.action.note,
       confirmText: this.hass.localize("ui.common.submit"),
       multiline: true,
     });
-    if (comment !== null) {
+    if (note !== null) {
       const value = { ...this.action };
-      if (comment === "") {
-        delete value.comment;
+      if (note === "") {
+        delete value.note;
       } else {
-        value.comment = comment;
+        value.note = note;
       }
       fireEvent(this, "value-changed", {
         value,
@@ -1089,7 +1107,7 @@ export default class HaAutomationActionRow extends LitElement {
       rename: () => {
         this._renameAction();
       },
-      editComment: this._editCommentAction,
+      editNote: this._editNoteAction,
       toggleYamlMode: () => {
         this._toggleYamlMode();
         this.openSidebar();
@@ -1185,8 +1203,8 @@ export default class HaAutomationActionRow extends LitElement {
       case "rename":
         this._renameAction();
         break;
-      case "edit_comment":
-        this._editCommentAction();
+      case "edit_note":
+        this._editNoteAction();
         break;
       case "duplicate":
         this._duplicateAction();

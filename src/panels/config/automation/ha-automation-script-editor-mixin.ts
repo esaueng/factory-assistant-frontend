@@ -1,8 +1,14 @@
 import { consume } from "@lit/context";
-import type { CSSResult, LitElement, TemplateResult } from "lit";
+import type {
+  CSSResult,
+  LitElement,
+  PropertyValues,
+  TemplateResult,
+} from "lit";
 import { css, html } from "lit";
 import { property, state } from "lit/decorators";
 import { transform } from "../../../common/decorators/transform";
+import { fireEvent } from "../../../common/dom/fire_event";
 import { goBack, navigate } from "../../../common/navigate";
 import { afterNextRender } from "../../../common/util/render-status";
 import "../../../components/animation/ha-fade-in";
@@ -135,6 +141,42 @@ export const AutomationScriptEditorMixin = <TConfig extends BaseEditorConfig>(
     protected entityRegCreated?: (
       value: PromiseLike<EntityRegistryEntry> | EntityRegistryEntry
     ) => void;
+
+    private _relatedContextAreaId?: string;
+
+    protected willUpdate(changedProps: PropertyValues): void {
+      super.willUpdate(changedProps);
+      if (
+        changedProps.has("currentEntityId") ||
+        changedProps.has("entityRegistry")
+      ) {
+        this._setRelatedContext();
+      }
+    }
+
+    private _setRelatedContext(): void {
+      const areaId = this.currentEntityId
+        ? this.entityRegistry?.find(
+            ({ entity_id }) => entity_id === this.currentEntityId
+          )?.area_id || undefined
+        : undefined;
+
+      if (areaId === this._relatedContextAreaId) {
+        return;
+      }
+
+      this._relatedContextAreaId = areaId;
+      fireEvent(
+        this,
+        "hass-related-context",
+        areaId
+          ? {
+              itemType: "area",
+              itemId: areaId,
+            }
+          : undefined
+      );
+    }
 
     protected renderLoading(): TemplateResult {
       return html`

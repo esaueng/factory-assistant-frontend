@@ -19,11 +19,11 @@ import { computeStateName } from "../../common/entity/compute_state_name";
 import { supportsFeature } from "../../common/entity/supports-feature";
 import { navigate } from "../../common/navigate";
 import { constructUrlCurrentPath } from "../../common/url/construct-url";
+import { extractSearchParamsObject } from "../../common/url/search-params";
 import {
-  createSearchParam,
-  extractSearchParam,
-  removeSearchParam,
-} from "../../common/url/search-params";
+  createTodoQueryString,
+  decodeTodoQueryParams,
+} from "../../common/url/todo-query-params";
 import "../../components/ha-button";
 import "../../components/ha-dropdown";
 import type { HaDropdownSelectEvent } from "../../components/ha-dropdown";
@@ -104,10 +104,11 @@ class PanelTodo extends LitElement {
     if (!this.hasUpdated) {
       this.hass.loadFragmentTranslation("lovelace");
 
-      const urlEntityId = extractSearchParam("entity_id");
-      this._openAddItemFromUrl = extractSearchParam("add_item") === "true";
-      if (urlEntityId) {
-        this._entityId = urlEntityId;
+      const params = decodeTodoQueryParams(extractSearchParamsObject());
+      this._openAddItemFromUrl = params.add_item ?? false;
+
+      if (params.entity_id) {
+        this._entityId = params.entity_id;
       } else {
         if (this._entityId && !(this._entityId in this.hass.states)) {
           this._entityId = undefined;
@@ -127,9 +128,12 @@ class PanelTodo extends LitElement {
     }
 
     this._openAddItemFromUrl = false;
-    navigate(constructUrlCurrentPath(removeSearchParam("add_item")), {
-      replace: true,
-    });
+    navigate(
+      constructUrlCurrentPath(
+        createTodoQueryString({ entity_id: this._entityId })
+      ),
+      { replace: true }
+    );
     if (
       supportsFeature(
         this.hass.states[this._entityId],
@@ -146,7 +150,9 @@ class PanelTodo extends LitElement {
       return;
     }
     navigate(
-      constructUrlCurrentPath(createSearchParam({ entity_id: this._entityId })),
+      constructUrlCurrentPath(
+        createTodoQueryString({ entity_id: this._entityId })
+      ),
       { replace: true }
     );
   }
@@ -184,11 +190,7 @@ class PanelTodo extends LitElement {
         footer
         .narrow=${this.narrow}
       >
-        <ha-menu-button
-          slot="navigationIcon"
-          .hass=${this.hass}
-          .narrow=${this.narrow}
-        ></ha-menu-button>
+        <ha-menu-button slot="navigationIcon"></ha-menu-button>
         <div slot="title">
           ${!showPane
             ? html`<ha-dropdown class="lists">
@@ -273,7 +275,7 @@ class PanelTodo extends LitElement {
         </div>
         ${entityState &&
         supportsFeature(entityState, TodoListEntityFeature.CREATE_TODO_ITEM)
-          ? html`<ha-button class="fab" size="large" @click=${this._addItem}>
+          ? html`<ha-button class="fab" size="l" @click=${this._addItem}>
               <ha-svg-icon slot="start" .path=${mdiPlus}></ha-svg-icon>
               ${this.hass.localize("ui.panel.todo.add_item")}
             </ha-button>`
@@ -285,7 +287,6 @@ class PanelTodo extends LitElement {
   private async _addList(): Promise<void> {
     showConfigFlowDialog(this, {
       startFlowHandler: "local_todo",
-      showAdvanced: this.hass.userData?.showAdvanced,
       manifest: await fetchIntegrationManifest(this.hass, "local_todo"),
     });
   }

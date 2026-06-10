@@ -53,14 +53,19 @@ export const rowStyles = css`
     position: absolute;
   }
 
-  .comment-indicator {
+  .icon-badge-wrapper {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .note-indicator {
     color: var(--ha-color-on-neutral-normal);
   }
-  .comment-indicator + ha-tooltip::part(body) {
+  .note-indicator + ha-tooltip::part(body) {
     cursor: default;
     max-width: 300px;
   }
-  .comment-indicator + ha-tooltip p {
+  .note-indicator + ha-tooltip p {
     white-space: pre-wrap;
     margin: 0;
   }

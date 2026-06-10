@@ -161,11 +161,14 @@ export class HaAutomationRow extends LitElement {
     }
     .leading-icon-wrapper {
       padding-top: var(--ha-space-3);
+      position: relative;
+      z-index: 1;
     }
     ::slotted([slot="leading-icon"]) {
       color: var(--ha-color-on-neutral-quiet);
     }
-    :host([building-block]) ::slotted([slot="leading-icon"]) {
+    :host([building-block]) ::slotted([slot="leading-icon"].action-icon),
+    :host([building-block]) ::slotted(#condition-icon) {
       --mdc-icon-size: var(--ha-space-5);
       color: var(--white-color);
       transform: rotate(-45deg);

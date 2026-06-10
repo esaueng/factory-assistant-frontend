@@ -33,30 +33,32 @@ export class HaAutomationRowLiveTest extends LitElement {
   static styles = css`
     :host {
       position: absolute;
+      top: -5px;
       inset-inline-end: -6px;
       display: inline-block;
     }
     #indicator {
-      width: 12px;
-      height: 12px;
+      width: 10px;
+      height: 10px;
       border-radius: var(--ha-border-radius-circle);
-      border: 3px solid;
+      border: var(--ha-border-width-md) solid;
       box-sizing: border-box;
       background-color: var(--card-background-color);
+      box-shadow: 0 0 0 2px var(--card-background-color);
       transition: all var(--ha-animation-duration-normal) ease-in-out;
     }
     :host([state="pass"]) #indicator {
-      background-color: var(--ha-color-fill-success-loud-resting);
-      border-color: var(--ha-color-fill-success-loud-resting);
+      background-color: var(--ha-color-green-60);
+      border-color: var(--ha-color-green-60);
     }
     :host([state="fail"]) #indicator {
-      border-color: var(--ha-color-fill-warning-loud-resting);
+      border-color: var(--ha-color-orange-60);
     }
     :host([state="invalid"]) #indicator {
-      border-color: var(--ha-color-fill-danger-loud-resting);
+      border-color: var(--ha-color-red-60);
     }
     :host([state="unknown"]) #indicator {
-      border-color: var(--ha-color-fill-neutral-loud-resting);
+      border-color: var(--ha-color-neutral-60);
     }
   `;
 }

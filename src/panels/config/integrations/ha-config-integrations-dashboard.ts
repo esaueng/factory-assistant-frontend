@@ -129,8 +129,6 @@ class HaConfigIntegrationsDashboard extends KeyboardShortcutMixin(
 
   @property({ attribute: "is-wide", type: Boolean }) public isWide = false;
 
-  @property({ attribute: false }) public showAdvanced = false;
-
   @property({ attribute: false }) public route!: Route;
 
   @property({ attribute: false }) public configEntries?: ConfigEntryExtended[];
@@ -513,7 +511,6 @@ class HaConfigIntegrationsDashboard extends KeyboardShortcutMixin(
     return html`
       <hass-tabs-subpage
         .hass=${this.hass}
-        .narrow=${this.narrow}
         .backPath=${this._searchParams.has("historyBack")
           ? undefined
           : "/config"}
@@ -560,7 +557,7 @@ class HaConfigIntegrationsDashboard extends KeyboardShortcutMixin(
                         )}
                         <ha-button
                           appearance="plain"
-                          size="small"
+                          size="s"
                           @click=${this._toggleShowDisabled}
                         >
                           ${this.hass.localize(
@@ -680,7 +677,7 @@ class HaConfigIntegrationsDashboard extends KeyboardShortcutMixin(
                     <ha-button
                       @click=${this._createFlow}
                       appearance="filled"
-                      size="small"
+                      size="s"
                     >
                       <ha-svg-icon slot="start" .path=${mdiPlus}></ha-svg-icon>
                       ${this.hass.localize(
@@ -712,7 +709,7 @@ class HaConfigIntegrationsDashboard extends KeyboardShortcutMixin(
                         <ha-button
                           @click=${this._createFlow}
                           appearance="filled"
-                          size="small"
+                          size="s"
                         >
                           <ha-svg-icon
                             slot="start"
@@ -726,7 +723,7 @@ class HaConfigIntegrationsDashboard extends KeyboardShortcutMixin(
                     `
                   : ""}
         </div>
-        <ha-button slot="fab" size="large" @click=${this._createFlow}>
+        <ha-button slot="fab" size="l" @click=${this._createFlow}>
           <ha-svg-icon slot="start" .path=${mdiPlus}></ha-svg-icon>
           ${this.hass.localize("ui.panel.config.integrations.add_integration")}
         </ha-button>
@@ -989,7 +986,6 @@ class HaConfigIntegrationsDashboard extends KeyboardShortcutMixin(
               this.hass,
               integration.supported_by!
             ),
-            showAdvanced: this.hass.userData?.showAdvanced,
           });
         },
       });

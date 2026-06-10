@@ -48,8 +48,6 @@ import type { AreaRegistryDetailDialogParams } from "./show-dialog-area-registry
 
 const cropOptions: CropOptions = {
   round: false,
-  type: "image/jpeg",
-  quality: 0.75,
 };
 
 const SENSOR_DOMAINS = ["sensor"];
@@ -208,7 +206,6 @@ class DialogAreaDetail
             )}
           </p>
           <ha-aliases-editor
-            .hass=${this.hass}
             .aliases=${this._aliases}
             @value-changed=${this._aliasesChanged}
           ></ha-aliases-editor>

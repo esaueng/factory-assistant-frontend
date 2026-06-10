@@ -1,7 +1,6 @@
 import "@home-assistant/webawesome/dist/components/divider/divider";
 import { consume } from "@lit/context";
 import {
-  mdiAlert,
   mdiAppleKeyboardCommand,
   mdiArrowDown,
   mdiArrowUp,
@@ -20,13 +19,10 @@ import {
   mdiStopCircleOutline,
 } from "@mdi/js";
 import deepClone from "deep-clone-simple";
-import type {
-  HassServiceTarget,
-  UnsubscribeFunc,
-} from "home-assistant-js-websocket";
+import type { HassServiceTarget } from "home-assistant-js-websocket";
 import { dump } from "js-yaml";
 import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
-import { LitElement, css, html, nothing } from "lit";
+import { LitElement, html, nothing } from "lit";
 import { customElement, property, query, state } from "lit/decorators";
 import { classMap } from "lit/directives/class-map";
 import memoizeOne from "memoize-one";
@@ -39,12 +35,10 @@ import { capitalizeFirstLetter } from "../../../../common/string/capitalize-firs
 import { truncateWithEllipsis } from "../../../../common/string/truncate-with-ellipsis";
 import { handleStructError } from "../../../../common/structs/handle-errors";
 import { copyToClipboard } from "../../../../common/util/copy-clipboard";
-import { debounce } from "../../../../common/util/debounce";
 import "../../../../components/automation/ha-automation-row";
 import type { HaAutomationRow } from "../../../../components/automation/ha-automation-row";
+import "../../../../components/automation/ha-automation-condition-live-test";
 import "../../../../components/automation/ha-automation-row-event-chip";
-import "../../../../components/automation/ha-automation-row-live-test";
-import type { LiveTestState } from "../../../../components/automation/ha-automation-row-live-test";
 import "../../../../components/ha-alert";
 import "../../../../components/ha-card";
 import "../../../../components/ha-condition-icon";
@@ -54,25 +48,14 @@ import "../../../../components/ha-dropdown-item";
 import "../../../../components/ha-expansion-panel";
 import "../../../../components/ha-icon-button";
 import "../../../../components/ha-tooltip";
-import "../../../../components/ha-trigger-icon";
 import type {
   AutomationClipboard,
-  AutomationConfig,
   Condition,
   ConditionSidebarConfig,
   PlatformCondition,
-  TriggerCondition,
 } from "../../../../data/automation";
-import {
-  automationConfigContext,
-  isCondition,
-  subscribeCondition,
-  testCondition,
-} from "../../../../data/automation";
-import {
-  describeCondition,
-  getTriggerInfos,
-} from "../../../../data/automation_i18n";
+import { isCondition, testCondition } from "../../../../data/automation";
+import { describeCondition } from "../../../../data/automation_i18n";
 import type { ConditionDescriptions } from "../../../../data/condition";
 import { CONDITION_BUILDING_BLOCKS } from "../../../../data/condition";
 import {
@@ -92,7 +75,6 @@ import type { HomeAssistant } from "../../../../types";
 import { isMac } from "../../../../util/is_mac";
 import { showEditorToast } from "../editor-toast";
 import "../ha-automation-editor-warning";
-import "../ha-trigger-id-chip";
 import { overflowStyles, rowStyles } from "../styles";
 import "../target/ha-automation-row-targets";
 import "./ha-automation-condition-editor";
@@ -164,12 +146,6 @@ export default class HaAutomationConditionRow extends LitElement {
 
   @state() private _selected = false;
 
-  @state() private _liveTestResult: LiveTestState = "unknown";
-
-  @state()
-  @consume({ context: automationConfigContext, subscribe: true })
-  private _automationConfig?: AutomationConfig;
-
   @state()
   @consume({ context: fullEntitiesContext, subscribe: true })
   _entityReg: EntityRegistryEntry[] = [];
@@ -181,8 +157,6 @@ export default class HaAutomationConditionRow extends LitElement {
   private _automationRowElement?: HaAutomationRow;
 
   private _testingTimeout?: number;
-
-  private _conditionUnsub?: Promise<UnsubscribeFunc>;
 
   get selected() {
     return this._selected;
@@ -216,45 +190,58 @@ export default class HaAutomationConditionRow extends LitElement {
     const conditionTargetSpec =
       this.conditionDescriptions[this.condition.condition]?.target;
 
-    const commentTooltipText = truncateWithEllipsis(
-      this.condition.comment?.trim() || "",
+    const noteTooltipText = truncateWithEllipsis(
+      this.condition.note?.trim() || "",
       250
     );
 
     return html`
-      <ha-condition-icon
-        slot="leading-icon"
-        .hass=${this.hass}
-        .condition=${this.condition.condition}
-      ></ha-condition-icon>
+      ${this.optionsInSidebar && this.condition.condition !== "trigger"
+        ? html`<ha-automation-condition-live-test
+            id="condition-icon"
+            slot="leading-icon"
+            .hass=${this.hass}
+            .condition=${this.condition}
+          >
+            <ha-condition-icon
+              .hass=${this.hass}
+              .condition=${this.condition.condition}
+            ></ha-condition-icon>
+          </ha-automation-condition-live-test>`
+        : html`<div
+            id="condition-icon"
+            class="icon-badge-wrapper"
+            slot="leading-icon"
+          >
+            <ha-condition-icon
+              .hass=${this.hass}
+              .condition=${this.condition.condition}
+            ></ha-condition-icon>
+          </div>`}
       <h3 slot="header">
-        ${this.condition.condition === "trigger"
-          ? this._renderTriggerConditionDescription(
-              this.condition as TriggerCondition
-            )
-          : capitalizeFirstLetter(
-              describeCondition(this.condition, this.hass, this._entityReg)
-            )}
+        ${capitalizeFirstLetter(
+          describeCondition(this.condition, this.hass, this._entityReg)
+        )}
         ${target !== undefined || (descriptionHasTarget && !this._isNew)
           ? this._renderTargets(
               target,
               descriptionHasTarget && !this._isNew,
-              conditionTargetSpec
+              conditionTargetSpec,
+              this.condition.condition !== "device"
             )
           : nothing}
-        ${this.condition.comment?.trim()
+        ${this.condition.note?.trim()
           ? html`
               <ha-svg-icon
-                id="comment-icon"
+                id="note-icon"
+                tabindex="0"
                 .path=${mdiCommentTextOutline}
                 .label=${this.hass.localize(
-                  "ui.panel.config.automation.editor.comment.label"
+                  "ui.panel.config.automation.editor.note.label"
                 )}
-                class="comment-indicator"
+                class="note-indicator"
               ></ha-svg-icon>
-              <ha-tooltip for="comment-icon"
-                ><p>${commentTooltipText}</p></ha-tooltip
-              >
+              <ha-tooltip for="note-icon"><p>${noteTooltipText}</p></ha-tooltip>
             `
           : nothing}
       </h3>
@@ -304,11 +291,11 @@ export default class HaAutomationConditionRow extends LitElement {
             )
           )}
         </ha-dropdown-item>
-        <ha-dropdown-item value="edit_comment">
+        <ha-dropdown-item value="edit_note">
           <ha-svg-icon slot="icon" .path=${mdiCommentEditOutline}></ha-svg-icon>
           ${this._renderOverflowLabel(
             this.hass.localize(
-              `ui.panel.config.automation.editor.comment.${this.condition.comment ? "edit" : "add"}`
+              `ui.panel.config.automation.editor.note.${this.condition.note ? "edit" : "add"}`
             )
           )}
         </ha-dropdown-item>
@@ -546,16 +533,7 @@ export default class HaAutomationConditionRow extends LitElement {
               @click=${this._toggleSidebar}
               @toggle-collapsed=${this._toggleCollapse}
               >${this._renderRow()}
-              <ha-automation-row-live-test
-                slot="icons"
-                .state=${this.condition.condition !== "trigger"
-                  ? this._liveTestResult
-                  : "unknown"}
-                .label=${this.hass.localize(
-                  `ui.panel.config.automation.editor.conditions.live_test_state.${this.condition.condition !== "trigger" ? this._liveTestResult : "unknown"}`
-                )}
-              ></ha-automation-row-live-test
-            ></ha-automation-row>`
+            </ha-automation-row>`
           : html`
               <ha-expansion-panel
                 left-chevron
@@ -585,120 +563,20 @@ export default class HaAutomationConditionRow extends LitElement {
     `;
   }
 
-  private _getTriggerInfos = memoizeOne(getTriggerInfos);
-
-  private _renderTriggerConditionDescription(condition: TriggerCondition) {
-    const ids = ensureArray(condition.id ?? [])
-      .map((id) => (typeof id === "string" ? id : String(id)))
-      .filter((id) => id !== "");
-    const prefix = capitalizeFirstLetter(
-      this.hass
-        .localize(
-          "ui.panel.config.automation.editor.conditions.type.trigger.description.full",
-          { id: "" }
-        )
-        .trim()
-    );
-    if (!ids.length) {
-      return html`${prefix}
-        <div class="trigger warning">
-          ${this.hass.localize(
-            "ui.panel.config.automation.editor.conditions.type.trigger.description.no_trigger"
-          )}
-        </div>`;
-    }
-
-    const triggerInfos = this._getTriggerInfos(
-      ensureArray(this._automationConfig?.triggers || []),
-      this.hass,
-      this._entityReg
-    );
-    const infoById = new Map(triggerInfos.map((info) => [info.id, info]));
-    return html`${prefix}
-    ${ids.map((id) => {
-      const info = infoById.get(id);
-      if (!info) {
-        return html`<div class="trigger">
-          <ha-trigger-id-chip id=${`trigger-${id}`} warning .triggerId=${id}>
-            <ha-svg-icon slot="start" .path=${mdiAlert}></ha-svg-icon>
-          </ha-trigger-id-chip>
-          ${ids.length < 4
-            ? html`<span
-                >${this.hass.localize("state.default.unavailable")}</span
-              >`
-            : nothing}
-
-          <ha-tooltip .for=${`trigger-${id}`}>
-            ${ids.length >= 4
-              ? html`<div>
-                  ${this.hass.localize("state.default.unavailable")}
-                </div>`
-              : nothing}
-            ${this.hass.localize(
-              "ui.panel.config.automation.editor.conditions.type.trigger.unavailable_info",
-              { id: html`<b>${id}</b>` }
-            )}
-          </ha-tooltip>
-        </div>`;
-      }
-      const triggerIcon = html`<ha-trigger-icon
-        .slot=${ids.length < 4 ? "start" : ""}
-        .hass=${this.hass}
-        .trigger=${info.triggerType}
-      ></ha-trigger-icon>`;
-
-      const isDuplicateId = info.count > 1;
-
-      return html`
-        <div class="trigger">
-          ${ids.length < 4 ? triggerIcon : nothing}
-          <ha-trigger-id-chip
-            id=${`trigger-${id}`}
-            .triggerId=${id}
-            .warning=${isDuplicateId}
-          >
-            ${isDuplicateId
-              ? html`<ha-svg-icon slot="start" .path=${mdiAlert}></ha-svg-icon>`
-              : nothing}
-          </ha-trigger-id-chip>
-          ${ids.length < 4
-            ? html`<span>${info.label}</span>`
-            : html`<ha-tooltip .for=${`trigger-${id}`}></ha-tooltip>`}
-          ${isDuplicateId || ids.length >= 4
-            ? html`<ha-tooltip .for=${`trigger-${id}`}>
-                ${ids.length >= 4
-                  ? html`<div>${triggerIcon}${info.label}</div>`
-                  : nothing}
-                ${isDuplicateId
-                  ? this.hass.localize(
-                      "ui.panel.config.automation.editor.triggers.duplicate_id_warning"
-                    )
-                  : nothing}
-              </ha-tooltip>`
-            : nothing}
-        </div>
-      `;
-    })}`;
-  }
-
   private _renderTargets = memoizeOne(
     (
       target?: HassServiceTarget,
       targetRequired = false,
-      targetSpec?: TargetSelector["target"]
+      targetSpec?: TargetSelector["target"],
+      interactive = false
     ) =>
       html`<ha-automation-row-targets
-        .hass=${this.hass}
         .target=${target}
         .targetRequired=${targetRequired}
         .selector=${targetSpec ? { target: targetSpec } : undefined}
+        .interactive=${interactive}
       ></ha-automation-row-targets>`
   );
-
-  public connectedCallback(): void {
-    super.connectedCallback();
-    this._subscribeCondition();
-  }
 
   protected firstUpdated(changedProperties: PropertyValues<this>): void {
     super.firstUpdated(changedProperties);
@@ -715,70 +593,11 @@ export default class HaAutomationConditionRow extends LitElement {
     }
   }
 
-  protected override updated(changedProps: PropertyValues<this>): void {
-    super.updated(changedProps);
-    if (
-      changedProps.has("condition") &&
-      changedProps.get("condition") !== undefined
-    ) {
-      this._resetSubscription();
-      this._debounceSubscribeCondition();
-    }
-  }
-
   public disconnectedCallback() {
     super.disconnectedCallback();
-    this._debounceSubscribeCondition.cancel();
     if (this._testingTimeout !== undefined) {
       clearTimeout(this._testingTimeout);
     }
-    this._resetSubscription();
-  }
-
-  private _resetSubscription() {
-    this._liveTestResult = "unknown";
-    if (this._conditionUnsub) {
-      this._conditionUnsub.then((unsub) => unsub());
-      this._conditionUnsub = undefined;
-    }
-  }
-
-  private _debounceSubscribeCondition = debounce(
-    () => this._subscribeCondition(),
-    500
-  );
-
-  private async _subscribeCondition() {
-    this._resetSubscription();
-
-    if (!this.condition) {
-      return;
-    }
-
-    const conditionUnsub = subscribeCondition(
-      this.hass.connection,
-      (result) => {
-        if (result.error) {
-          this._handleLiveTestError(result.error);
-        } else {
-          this._liveTestResult = result.result ? "pass" : "fail";
-        }
-      },
-      this.condition
-    );
-    conditionUnsub.catch((err: any) => {
-      this._handleLiveTestError(err);
-      if (this._conditionUnsub === conditionUnsub) {
-        this._conditionUnsub = undefined;
-      }
-    });
-    this._conditionUnsub = conditionUnsub;
-  }
-
-  private _handleLiveTestError(error: any) {
-    const invalid =
-      typeof error !== "string" && error.code === "invalid_format";
-    this._liveTestResult = invalid ? "invalid" : "unknown";
   }
 
   private _onValueChange(event: CustomEvent) {
@@ -945,25 +764,25 @@ export default class HaAutomationConditionRow extends LitElement {
     }
   };
 
-  private _editCommentCondition = async (): Promise<void> => {
-    const comment = await showPromptDialog(this, {
+  private _editNoteCondition = async (): Promise<void> => {
+    const note = await showPromptDialog(this, {
       title: this.hass.localize(
-        `ui.panel.config.automation.editor.comment.${this.condition.comment ? "edit" : "add"}`
+        `ui.panel.config.automation.editor.note.${this.condition.note ? "edit" : "add"}`
       ),
       inputLabel: this.hass.localize(
-        "ui.panel.config.automation.editor.comment.label"
+        "ui.panel.config.automation.editor.note.label"
       ),
       inputType: "string",
-      defaultValue: this.condition.comment,
+      defaultValue: this.condition.note,
       confirmText: this.hass.localize("ui.common.submit"),
       multiline: true,
     });
-    if (comment !== null) {
+    if (note !== null) {
       const value = { ...this.condition };
-      if (comment === "") {
-        delete value.comment;
+      if (note === "") {
+        delete value.note;
       } else {
-        value.comment = comment;
+        value.note = note;
       }
       fireEvent(this, "value-changed", {
         value,
@@ -1118,7 +937,7 @@ export default class HaAutomationConditionRow extends LitElement {
       rename: () => {
         this._renameCondition();
       },
-      editComment: this._editCommentCondition,
+      editNote: this._editNoteCondition,
       toggleYamlMode: () => {
         this._toggleYamlMode();
         this.openSidebar();
@@ -1190,8 +1009,8 @@ export default class HaAutomationConditionRow extends LitElement {
       case "rename":
         this._renameCondition();
         break;
-      case "edit_comment":
-        this._editCommentCondition();
+      case "edit_note":
+        this._editNoteCondition();
         break;
       case "duplicate":
         this._duplicateCondition();
@@ -1224,26 +1043,7 @@ export default class HaAutomationConditionRow extends LitElement {
   }
 
   static get styles(): CSSResultGroup {
-    return [
-      rowStyles,
-      overflowStyles,
-      css`
-        .trigger {
-          display: flex;
-          align-items: center;
-          gap: var(--ha-space-2);
-          background-color: var(--ha-color-fill-neutral-normal-resting);
-          border-radius: var(--ha-border-radius-md);
-          padding-inline: var(--ha-space-2);
-          color: var(--ha-color-on-neutral-normal);
-          height: 32px;
-        }
-        .trigger.warning {
-          background-color: var(--ha-color-fill-warning-normal-resting);
-          color: var(--ha-color-on-warning-normal);
-        }
-      `,
-    ];
+    return [rowStyles, overflowStyles];
   }
 }
 

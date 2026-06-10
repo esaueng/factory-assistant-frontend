@@ -1,4 +1,3 @@
-import { createContext } from "@lit/context";
 import type {
   Connection,
   HassEntityAttributeBase,
@@ -96,7 +95,7 @@ export interface TriggerList {
 
 export interface BaseTrigger {
   alias?: string;
-  comment?: string;
+  note?: string;
   /** @deprecated Use `trigger` instead */
   platform?: string;
   trigger: string;
@@ -242,7 +241,7 @@ export type Trigger = LegacyTrigger | TriggerList | PlatformTrigger;
 interface BaseCondition {
   condition: string;
   alias?: string;
-  comment?: string;
+  note?: string;
   enabled?: boolean;
   options?: Record<string, unknown>;
 }
@@ -486,17 +485,28 @@ export const migrateAutomationTrigger = (
     }
     delete trigger.platform;
   }
+
+  if ("options" in trigger) {
+    if (trigger.options && "behavior" in trigger.options) {
+      if (trigger.options.behavior === "any") {
+        trigger.options.behavior = "each";
+      } else if (trigger.options.behavior === "last") {
+        trigger.options.behavior = "all";
+      }
+    }
+  }
+
   return trigger;
 };
 
 export const flattenTriggers = (
   triggers: undefined | Trigger | Trigger[]
-): Exclude<Trigger, TriggerList>[] => {
+): Trigger[] => {
   if (!triggers) {
     return [];
   }
 
-  const flatTriggers: Exclude<Trigger, TriggerList>[] = [];
+  const flatTriggers: Trigger[] = [];
 
   ensureArray(triggers).forEach((t) => {
     if ("triggers" in t) {
@@ -610,7 +620,7 @@ export interface AutomationClipboard {
 export interface BaseSidebarConfig {
   delete: () => void;
   close: (focus?: boolean) => void;
-  editComment: () => void;
+  editNote: () => void;
 }
 
 export interface TriggerSidebarConfig extends BaseSidebarConfig {
@@ -672,7 +682,7 @@ export interface OptionSidebarConfig extends BaseSidebarConfig {
   rename: () => void;
   duplicate: () => void;
   defaultOption?: boolean;
-  comment?: string;
+  note?: string;
 }
 
 export interface ScriptFieldSidebarConfig extends BaseSidebarConfig {
@@ -698,7 +708,3 @@ export interface ShowAutomationEditorParams {
   data?: Partial<AutomationConfig>;
   expanded?: boolean;
 }
-
-export const automationConfigContext = createContext<
-  AutomationConfig | undefined
->("automationConfig");

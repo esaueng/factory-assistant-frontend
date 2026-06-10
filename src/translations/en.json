@@ -250,6 +250,7 @@
         "browse_media": "Browse media",
         "turn_on": "Turn on",
         "turn_off": "Turn off",
+        "power": "Power",
         "media_play": "Play",
         "media_play_pause": "Play/pause",
         "media_pause": "Pause",
@@ -638,7 +639,7 @@
         "automation_behavior": {
           "trigger": {
             "options": {
-              "any": {
+              "each": {
                 "label": "Each",
                 "description": "Triggers once for every target that changes"
               },
@@ -646,7 +647,7 @@
                 "label": "First",
                 "description": "Triggers the first time any target changes"
               },
-              "last": {
+              "all": {
                 "label": "All",
                 "description": "Triggers once all targets have changed"
               }
@@ -1196,6 +1197,7 @@
       "data-table": {
         "search": "Search",
         "no-data": "No data",
+        "no_match_filter": "No rows matching current filters",
         "filtering_by": "Filtering by",
         "hidden": "{number} hidden",
         "clear": "Clear",
@@ -1693,14 +1695,17 @@
           "last_triggered": "Last triggered"
         },
         "add_to": {
-          "title": "Add to",
-          "actions": {
-            "automation_trigger": "Create new automation using {target} as a trigger",
-            "automation_condition": "Create new automation using {target} as a condition",
-            "automation_action": "Create new automation using {target} in an action",
-            "script_action": "Create new script using {target} in an action",
-            "scene": "Create new scene using {target}"
+          "title": "Add {target} to…",
+          "item": "Add to…",
+          "action_options": {
+            "automation_trigger": "Create as a new trigger",
+            "automation_condition": "Create as a new condition",
+            "automation_action": "Create as a new action",
+            "script_action": "Create as a new action",
+            "scene": "Create as a new scene"
           },
+          "automations_heading": "Automations",
+          "scripts_heading": "Scripts",
           "app_actions": "App actions",
           "no_actions": "No actions available",
           "action_failed": "Failed to perform the action {error}"
@@ -1891,6 +1896,7 @@
           "default_code": "Default code",
           "default_code_error": "Code does not match code format",
           "calendar_color": "Calendar color",
+          "associated_zone": "Associated zone",
           "entity_id": "Entity ID",
           "unit_of_measurement": "Unit of measurement",
           "precipitation_unit": "Precipitation unit",
@@ -2249,15 +2255,6 @@
         "attribute": "Attribute",
         "min_max_change": "min/max/change"
       },
-      "zha_manage_device": {
-        "heading": "Manage Zigbee device",
-        "tabs": {
-          "clusters": "Clusters",
-          "bindings": "Bindings",
-          "signature": "Signature",
-          "neighbors": "Neighbors"
-        }
-      },
       "zha_device_info": {
         "manuf": "by {manufacturer}",
         "no_area": "No area",
@@ -2422,6 +2419,11 @@
           "header": "Enter setup code",
           "code_instructions": "Search for the sharing mode in the app of your controller, and activate it. You will get a setup code, enter that below.",
           "setup_code": "Setup code"
+        },
+        "device_added": {
+          "header": "Device added",
+          "finish": "Finish",
+          "skip": "Skip and finish"
         }
       },
       "shortcuts": {
@@ -2744,6 +2746,11 @@
         "updates": {
           "caption": "Updates",
           "description": "Manage updates of Home Assistant, apps, and devices",
+          "group_system": "Home Assistant",
+          "group_integrations": "Integrations",
+          "group_apps": "Apps",
+          "update_all": "Update all",
+          "update_all_failed": "Failed to start updates",
           "no_updates": "No updates available",
           "no_update_entities": {
             "title": "Unable to check for updates",
@@ -2755,6 +2762,7 @@
           "checking_updates": "Checking for updates...",
           "title": "{count} {count, plural,\n  one {update}\n  other {updates}\n}",
           "title_not_installable": "{count} not installable {count, plural,\n  one {update}\n  other {updates}\n}",
+          "title_skipped": "{count} skipped {count, plural,\n  one {update}\n  other {updates}\n}",
           "unable_to_fetch": "Unable to load updates",
           "more_updates": "Show all updates",
           "show": "show",
@@ -3816,6 +3824,7 @@
         "developer-tools": {
           "tabs": {
             "assist": {
+              "tab": "Assist",
               "title": "Sentences parser",
               "description": "Enter sentences and see how they will be parsed by Home Assistant. Each line will be processed as an individual sentence. Intents will not be executed on your instance.",
               "parse_sentences": "Parse sentences",
@@ -4123,6 +4132,17 @@
             "gas": "Gas",
             "water": "Water"
           },
+          "customise": {
+            "toolbar_action": "Customize cards",
+            "title": "Customize energy",
+            "saved": "Energy dashboard updated",
+            "save_failed": "Failed to save energy customization",
+            "unavailable": "This card isn't shown because the energy source or device it needs isn't configured.",
+            "groups": {
+              "overview": "Overview",
+              "now": "Now"
+            }
+          },
           "delete_source": "Are you sure you want to remove this source?",
           "delete_integration": "Are you sure you want to remove this integration? It will remove the entities it provides",
           "grid": {
@@ -4361,7 +4381,9 @@
             "error_information": "Error information",
             "delete_confirm_title": "Delete helper?",
             "delete_confirm_text": "Are you sure you want to delete {name}?",
-            "delete_failed": "Failed to delete helper"
+            "delete_failed": "Failed to delete helper",
+            "no_category_support": "You can't assign a category to this helper",
+            "no_category_entity_reg": "To assign a category to a helper it needs to have a unique ID."
           },
           "dialog": {
             "create": "Create",
@@ -5074,10 +5096,10 @@
               "placeholder": "Optional description",
               "add": "Add description"
             },
-            "comment": {
-              "label": "Comment",
-              "edit": "Edit comment",
-              "add": "Add comment"
+            "note": {
+              "label": "Note",
+              "edit": "Edit note",
+              "add": "Add note"
             },
             "leave": {
               "unsaved_new_title": "Save new automation?",
@@ -5183,7 +5205,6 @@
               "optional": "Optional",
               "edit_id": "Edit ID",
               "duplicate": "[%key:ui::common::duplicate%]",
-              "duplicate_id_warning": "This trigger ID is used multiple times in this automation. Trigger IDs should be unique.",
               "re_order": "Re-order",
               "rename": "Rename",
               "cut": "Cut",
@@ -5570,7 +5591,7 @@
                   "sunset": "Sunset",
                   "description": {
                     "picker": "Tests if the sun is above or below the horizon.",
-                    "between": "Between {beforeChoice, select, \n sunrise { sunrise}\n sunset { sunset}\n other {}\n}{beforeOffsetChoice, select, \n offset { {beforeOffset}}\n other {}\n} and {afterChoice, select, \n sunrise { sunrise}\n sunset { sunset}\n other {}\n}{afterOffsetChoice, select, \n offset { {afterOffset}}\n other {}\n}",
+                    "between": "Between {afterChoice, select, \n sunrise { sunrise}\n sunset { sunset}\n other {}\n}{afterOffsetChoice, select, \n offset { {afterOffset}}\n other {}\n} and {beforeChoice, select, \n sunrise { sunrise}\n sunset { sunset}\n other {}\n}{beforeOffsetChoice, select, \n offset { {beforeOffset}}\n other {}\n}",
                     "before": "Before {beforeChoice, select, \n sunrise { sunrise}\n sunset { sunset}\n other {}\n}{beforeOffsetChoice, select, \n offset { {beforeOffset}}\n other {}\n}",
                     "after": "After {afterChoice, select, \n sunrise { sunrise}\n sunset { sunset}\n other {}\n}{afterOffsetChoice, select, \n offset { {afterOffset}}\n other {}\n}"
                   }
@@ -5609,13 +5630,10 @@
                 "trigger": {
                   "label": "Triggered by",
                   "no_triggers": "There are no triggers with ID's set in this automation. Edit a trigger and give it a Trigger ID name.",
-                  "duplicated_info": "This ID is used by multiple triggers. Trigger IDs should be unique.",
-                  "unavailable_info": "No trigger has the ID {id}. Set this ID on a trigger to use it.",
                   "id": "Trigger",
                   "description": {
                     "picker": "Tests if the automation has been triggered by a specific trigger.",
-                    "full": "If triggered by {id}",
-                    "no_trigger": "No trigger selected"
+                    "full": "If triggered by {id}"
                   }
                 },
                 "zone": {
@@ -5947,6 +5965,7 @@
               "iteration": "Iteration {number}",
               "executed": "Executed: {time}",
               "error": "Error: {error}",
+              "template_errors": "Template errors:",
               "result": "Result:",
               "step_not_executed": "This step was not executed.",
               "no_logbook_entries": "No activity found for this step.",
@@ -6317,7 +6336,8 @@
             "resend_confirm_email": "Resend confirmation email",
             "clicked_confirm": "I opened the confirmation link",
             "confirm_email": "Check the email we just sent to {email} and open the confirmation link to continue.",
-            "account_created": "Account created! Check your email for instructions on how to activate your account."
+            "account_created": "Account created! Check your email for instructions on how to activate your account.",
+            "verification_email_sent": "Verification email sent. Check your inbox for instructions on how to activate your account."
           },
           "account": {
             "download_support_package": "Download support package",
@@ -6908,6 +6928,7 @@
               }
             },
             "custom_integration": "Custom integration",
+            "helper": "Helper",
             "legacy_integration": "Legacy integration",
             "custom_overwrites_core": "Custom integration that replaces a Core component",
             "depends_on_cloud": "Requires Internet",
@@ -7307,10 +7328,32 @@
             "no_devices_found": "No devices were found, make sure they are in pairing mode and keep them awake while Home Assistant is searching.",
             "search_again": "Search again"
           },
+          "device_page": {
+            "heading": "Manage Zigbee device",
+            "information": "Device information",
+            "ieee": "IEEE",
+            "nwk": "NWK",
+            "bindings_error": "Failed to load binding options",
+            "no_bindings": "No bindable devices or groups were found",
+            "not_found": "Zigbee device not found",
+            "tabs": {
+              "clusters": "Clusters",
+              "bindings": "Bindings",
+              "signature": "Signature",
+              "neighbors": "Neighbors"
+            },
+            "tab_descriptions": {
+              "signature": "View the raw Zigbee signature for this device.",
+              "neighbors": "View neighboring Zigbee devices reported by this device."
+            }
+          },
           "add_device": "Add device",
           "clusters": {
             "header": "Clusters",
-            "help_cluster_dropdown": "Select a cluster to view attributes and commands.",
+            "change_cluster": "Change cluster",
+            "cluster_description": "Endpoint ID: {endpoint} · ID: {id} · Type: {type}",
+            "load_failed": "Failed to load clusters",
+            "no_clusters": "No clusters found",
             "tabs": {
               "attributes": "Attributes",
               "commands": "Commands"
@@ -7387,6 +7430,8 @@
             "offline": "Offline"
           },
           "device_binding": {
+            "header": "Device binding",
+            "introduction": "Bind this device to another Zigbee device or unbind it.",
             "bind": "Bind",
             "unbind": "Unbind",
             "picker_label": "Bindable devices"
@@ -7406,7 +7451,9 @@
             "name": "Name",
             "lqi": "LQI",
             "relationship": "Relationship",
-            "depth": "Depth"
+            "depth": "Depth",
+            "load_failed": "Failed to load neighbors",
+            "no_neighbors": "No neighbors found"
           },
           "change_channel_dialog": {
             "title": "Change Zigbee channel",
@@ -10127,15 +10174,20 @@
               },
               "media-player-playback": {
                 "label": "Media player playback controls",
-                "controls": "Controls"
+                "customize": "Customize controls",
+                "controls": "Controls",
+                "hide_disabled_controls": "Hide disabled controls",
+                "hide_disabled_controls_helper": "Hide controls that don't apply to the current state instead of showing them disabled"
               },
               "media-player-sound-mode": {
                 "label": "Media player sound mode",
-                "sound_modes": "Sound modes"
+                "sound_modes": "Sound modes",
+                "customize": "Customize sound modes"
               },
               "media-player-source": {
                 "label": "Media player source",
-                "sources": "Sources"
+                "sources": "Sources",
+                "customize": "Customize sources"
               },
               "media-player-volume-buttons": {
                 "label": "Media player volume buttons",
@@ -10148,6 +10200,7 @@
               },
               "vacuum-commands": {
                 "label": "Vacuum commands",
+                "customize": "Customize commands",
                 "commands": "Commands",
                 "commands_list": {
                   "start_pause": "[%key:ui::dialogs::more_info_control::vacuum::start_pause%]",
@@ -10219,7 +10272,9 @@
               },
               "counter-actions": {
                 "label": "Counter actions",
-                "actions": {
+                "customize": "Customize actions",
+                "actions": "Actions",
+                "actions_list": {
                   "increment": "Increment",
                   "decrement": "Decrement",
                   "reset": "Reset"
@@ -10282,6 +10337,7 @@
               },
               "lawn-mower-commands": {
                 "label": "Lawn mower commands",
+                "customize": "Customize commands",
                 "commands": "Commands",
                 "commands_list": {
                   "start_pause": "Start Pause",
@@ -10425,6 +10481,7 @@
             "no_search_results_description": "Try a different keyword.",
             "selected_entity": "Selected entity",
             "suggestions_title": "Suggestions",
+            "community_title": "Community",
             "not_found": "Can't find the card you want?",
             "suggestions": {
               "periods": {
@@ -10681,11 +10738,6 @@
           "step_done": "Setup done for {step}",
           "close": "Close",
           "submit": "Submit"
-        },
-        "advanced_mode": {
-          "title": "Advanced mode",
-          "description": "Unlocks advanced features.",
-          "link_promo": "Learn more"
         },
         "entity_id_picker": {
           "title": "Display entity IDs in picker",
@@ -11176,7 +11228,12 @@
           "energy_top_consumers_title": "Top consumers",
           "power_sankey_title": "Current power flow",
           "water_flow_sankey_title": "Current water flow",
-          "power_sources_graph_title": "Power sources"
+          "power_sources_graph_title": "Power sources",
+          "energy_grid_balance_title": "Grid energy balance",
+          "energy_grid_neutrality_gauge_title": "Grid neutrality gauge",
+          "energy_solar_consumed_gauge_title": "Solar consumed gauge",
+          "energy_self_sufficiency_gauge_title": "Self-sufficiency gauge",
+          "energy_carbon_consumed_gauge_title": "Carbon consumed gauge"
         }
       },
       "history": {
@@ -11201,7 +11258,7 @@
   },
   "landing-page": {
     "header": "Preparing Home Assistant",
-    "subheader": "This may take 20 minutes or more",
+    "subheader": "The latest version of Home Assistant is being downloaded. This may take 20 minutes or more.",
     "show_details": "Show details",
     "hide_details": "Hide details",
     "network_issue": {

@@ -774,7 +774,11 @@ export class HaConfigEntities extends LitElement {
             .checked=${selected}
             .indeterminate=${partial}
           ></ha-checkbox>
-          <ha-label .color=${label.color} .description=${label.description}>
+          <ha-label
+            .color=${label.color}
+            .description=${label.description}
+            class="text-ellipsis"
+          >
             ${label.icon
               ? html`<ha-icon slot="icon" .icon=${label.icon}></ha-icon>`
               : nothing}
@@ -1010,7 +1014,6 @@ export class HaConfigEntities extends LitElement {
           @expanded-changed=${this._filterExpanded}
         ></ha-filter-domains>
         <ha-filter-integrations
-          .hass=${this.hass}
           .value=${this._filters["ha-filter-integrations"]}
           @data-table-filter-changed=${this._filterChanged}
           slot="filter-pane"
@@ -1050,7 +1053,7 @@ export class HaConfigEntities extends LitElement {
           @expanded-changed=${this._filterExpanded}
         ></ha-filter-voice-assistants>
         ${includeAddDeviceFab
-          ? html`<ha-button size="large" @click=${this._addDevice} slot="fab">
+          ? html`<ha-button size="l" @click=${this._addDevice} slot="fab">
               <ha-svg-icon slot="start" .path=${mdiPlus}></ha-svg-icon>
               ${this.hass.localize("ui.panel.config.devices.add_device")}
             </ha-button>`
@@ -1674,9 +1677,13 @@ ${rejected
         ha-assist-chip {
           --ha-assist-chip-container-shape: 10px;
         }
-        ha-dropdown::part(menu),
-        ha-dropdown::part(submenu) {
+        ha-dropdown::part(menu) {
           --auto-size-available-width: calc(50vw - var(--ha-space-4));
+        }
+        ha-dropdown-item::part(submenu) {
+          max-width: calc(60vw - var(--ha-space-8));
+          max-height: calc(100vh - var(--ha-space-8));
+          overflow-y: auto;
         }
         ha-dropdown ha-assist-chip {
           --md-assist-chip-trailing-space: 8px;

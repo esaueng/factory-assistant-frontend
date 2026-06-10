@@ -5,9 +5,10 @@
  * the demo content renders without JS errors and the page element is visible.
  *
  * Run with:
- *   yarn test:e2e:gallery:local
+ *   yarn test:e2e:gallery
  */
 import { test, expect, type Page } from "@playwright/test";
+import { QUICK_TIMEOUT, SHELL_TIMEOUT } from "./helpers";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -40,7 +41,7 @@ async function assertPageLoads(page: Page, hash: string, selector: string) {
 
   // Pierce ha-gallery's shadow root with >>
   await expect(page.locator(`ha-gallery >> ${selector}`).first()).toBeAttached({
-    timeout: 15_000,
+    timeout: SHELL_TIMEOUT,
   });
 
   const realErrors = errors.filter(
@@ -72,7 +73,9 @@ test.describe("Gallery shell", () => {
     page.on("pageerror", (e) => errors.push(e.message));
 
     await page.goto("/");
-    await expect(page.locator("ha-gallery")).toBeAttached({ timeout: 15_000 });
+    await expect(page.locator("ha-gallery")).toBeAttached({
+      timeout: SHELL_TIMEOUT,
+    });
 
     const realErrors = errors.filter(
       (e) => !e.includes("ResizeObserver") && !e.includes("Non-Error")
@@ -85,7 +88,7 @@ test.describe("Gallery shell", () => {
     await page.waitForSelector("ha-gallery", { state: "attached" });
     // The gallery drawer sidebar is inside ha-gallery's shadow root
     await expect(page.locator("ha-gallery >> mwc-drawer")).toBeAttached({
-      timeout: 10_000,
+      timeout: QUICK_TIMEOUT,
     });
   });
 });
@@ -250,15 +253,15 @@ test.describe("Component interactions", () => {
   test("ha-alert renders all four types", async ({ page }) => {
     await goToGalleryPage(page, "components/ha-alert");
     const demo = page.locator("ha-gallery >> demo-components-ha-alert");
-    await expect(demo).toBeAttached({ timeout: 15_000 });
+    await expect(demo).toBeAttached({ timeout: SHELL_TIMEOUT });
 
     // The demo uses property binding (.alertType) not attribute binding,
     // so we verify that multiple ha-alert elements are present.
     const alerts = demo.locator("ha-alert");
-    await expect(alerts.first()).toBeAttached({ timeout: 10_000 });
+    await expect(alerts.first()).toBeAttached({ timeout: QUICK_TIMEOUT });
     // There should be at least 4 alerts (one per type)
     await expect(alerts)
-      .toHaveCount(4, { timeout: 10_000 })
+      .toHaveCount(4, { timeout: QUICK_TIMEOUT })
       .catch(async () => {
         // If not exactly 4, just verify there are some (demo may include more)
         const count = await alerts.count();
@@ -269,9 +272,9 @@ test.describe("Component interactions", () => {
   test("ha-button renders primary action button", async ({ page }) => {
     await goToGalleryPage(page, "components/ha-button");
     const demo = page.locator("ha-gallery >> demo-components-ha-button");
-    await expect(demo).toBeAttached({ timeout: 15_000 });
+    await expect(demo).toBeAttached({ timeout: SHELL_TIMEOUT });
     await expect(demo.locator("ha-button, mwc-button").first()).toBeAttached({
-      timeout: 10_000,
+      timeout: QUICK_TIMEOUT,
     });
   });
 
@@ -280,69 +283,80 @@ test.describe("Component interactions", () => {
     const demo = page.locator(
       "ha-gallery >> demo-components-ha-control-slider"
     );
-    await expect(demo).toBeAttached({ timeout: 15_000 });
+    await expect(demo).toBeAttached({ timeout: SHELL_TIMEOUT });
     await expect(demo.locator("ha-control-slider").first()).toBeAttached({
-      timeout: 10_000,
+      timeout: QUICK_TIMEOUT,
     });
   });
 
   test("ha-form renders schema-driven fields", async ({ page }) => {
     await goToGalleryPage(page, "components/ha-form");
     const demo = page.locator("ha-gallery >> demo-components-ha-form");
-    await expect(demo).toBeAttached({ timeout: 15_000 });
+    await expect(demo).toBeAttached({ timeout: SHELL_TIMEOUT });
     await expect(demo.locator("ha-form").first()).toBeAttached({
-      timeout: 10_000,
+      timeout: QUICK_TIMEOUT,
     });
   });
 
   test("ha-dialog demo renders a dialog trigger", async ({ page }) => {
     await goToGalleryPage(page, "components/ha-dialog");
     const demo = page.locator("ha-gallery >> demo-components-ha-dialog");
-    await expect(demo).toBeAttached({ timeout: 15_000 });
+    await expect(demo).toBeAttached({ timeout: SHELL_TIMEOUT });
   });
 
   test("tile-card renders entity state", async ({ page }) => {
     await goToGalleryPage(page, "lovelace/tile-card");
     const demo = page.locator("ha-gallery >> demo-lovelace-tile-card");
-    await expect(demo).toBeAttached({ timeout: 15_000 });
+    await expect(demo).toBeAttached({ timeout: SHELL_TIMEOUT });
     await expect(demo.locator("hui-tile-card").first()).toBeAttached({
-      timeout: 10_000,
+      timeout: QUICK_TIMEOUT,
     });
   });
 
   test("more-info light renders controls", async ({ page }) => {
     await goToGalleryPage(page, "more-info/light");
     const demo = page.locator("ha-gallery >> demo-more-info-light");
-    await expect(demo).toBeAttached({ timeout: 15_000 });
+    await expect(demo).toBeAttached({ timeout: SHELL_TIMEOUT });
     // Light more-info should contain a brightness or color-temp control
     await expect(
       demo
         .locator("ha-control-slider, ha-more-info-light, more-info-content")
         .first()
-    ).toBeAttached({ timeout: 15_000 });
+    ).toBeAttached({ timeout: SHELL_TIMEOUT });
   });
 
   test("more-info cover renders position controls", async ({ page }) => {
     await goToGalleryPage(page, "more-info/cover");
     const demo = page.locator("ha-gallery >> demo-more-info-cover");
-    await expect(demo).toBeAttached({ timeout: 15_000 });
+    await expect(demo).toBeAttached({ timeout: SHELL_TIMEOUT });
   });
 
   test("ha-gauge renders a gauge element", async ({ page }) => {
     await goToGalleryPage(page, "components/ha-gauge");
     const demo = page.locator("ha-gallery >> demo-components-ha-gauge");
-    await expect(demo).toBeAttached({ timeout: 15_000 });
+    await expect(demo).toBeAttached({ timeout: SHELL_TIMEOUT });
     // ha-gauge page is markdown-based; gauge elements render in the description area
     await expect(page.locator("ha-gallery >> ha-gauge").first()).toBeAttached({
-      timeout: 10_000,
+      timeout: QUICK_TIMEOUT,
     });
   });
 
-  test("ha-switch toggles state", async ({ page }) => {
+  test("ha-switch toggles state on click", async ({ page }) => {
     await goToGalleryPage(page, "components/ha-switch");
     const demo = page.locator("ha-gallery >> demo-components-ha-switch");
-    await expect(demo).toBeAttached({ timeout: 15_000 });
-    const switchEl = demo.locator("ha-switch").first();
-    await expect(switchEl).toBeAttached({ timeout: 10_000 });
+    await expect(demo).toBeAttached({ timeout: SHELL_TIMEOUT });
+
+    // Find the first interactive (non-disabled) switch. Pull its checked state
+    // from the property — ha-switch toggles via property, not the attribute.
+    const switchEl = demo.locator("ha-switch:not([disabled])").first();
+    await expect(switchEl).toBeAttached({ timeout: QUICK_TIMEOUT });
+
+    const before = await switchEl.evaluate((el: any) => el.checked === true);
+    await switchEl.click();
+    await expect
+      .poll(() => switchEl.evaluate((el: any) => el.checked === true), {
+        timeout: QUICK_TIMEOUT,
+      })
+      .toBe(!before);
   });
 });

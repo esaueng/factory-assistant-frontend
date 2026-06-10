@@ -1,15 +1,18 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
+import {
+  NAVIGATION_TIMEOUT,
+  PANEL_TIMEOUT,
+  QUICK_TIMEOUT,
+  SHELL_TIMEOUT,
+  appErrors as filterAppErrors,
+  waitForOrSkip,
+} from "./helpers";
 
 // BrowserStack mobile platforms only allow a single browser context per
 // session.  Using serial mode + a shared page (created once in beforeAll)
 // avoids Playwright spinning up a new context for each test.
 test.describe.configure({ mode: "serial" });
-
-// Dynamic JS imports can fail to load over the BrowserStack tunnel on certain
-// mobile/browser combos. These are infrastructure errors, not app bugs.
-const DYNAMIC_IMPORT_ERROR =
-  /error loading dynamically imported module|Importing a module script failed/i;
 
 test.describe("Home Assistant Demo", () => {
   // Collect JS errors during each test so we can assert no unexpected crashes.
@@ -46,46 +49,8 @@ test.describe("Home Assistant Demo", () => {
     await sharedPage.goto("/");
   });
 
-  /** Returns only errors that are genuine app bugs (not infra tunnel errors). */
   function appErrors() {
-    return pageErrors.filter((err) => !DYNAMIC_IMPORT_ERROR.test(err.message));
-  }
-
-  /** True when a dynamic-import network error was recorded. */
-  function hasDynamicImportError() {
-    return pageErrors.some((err) => DYNAMIC_IMPORT_ERROR.test(err.message));
-  }
-
-  /**
-   * Wait for `locator` to become attached/visible with a fallback for
-   * BrowserStack iOS WebKit which throws "Internal error" on waitForSelector.
-   * When the internal error is thrown, we pause briefly so async pageerror
-   * events can fire, then re-throw only if there was no dynamic-import error.
-   */
-  async function waitForLocator(
-    page: Page,
-    selector: string,
-    state: "attached" | "visible" = "attached",
-    timeout = 30_000
-  ) {
-    try {
-      await page.locator(selector).first().waitFor({ state, timeout });
-    } catch (err) {
-      // Give pageerror listeners a moment to fire.
-      await page.waitForTimeout(1_000);
-      if (hasDynamicImportError()) {
-        // JS chunk failed to load over the tunnel — not an app bug.
-        return "skip" as const;
-      }
-      // BrowserStack iOS WebKit throws "Internal error" on waitForSelector —
-      // treat this as a platform infrastructure issue and skip.
-      const msg = err instanceof Error ? err.message : String(err);
-      if (/Internal error/i.test(msg)) {
-        return "skip" as const;
-      }
-      throw err;
-    }
-    return "ok" as const;
+    return filterAppErrors(pageErrors);
   }
 
   // ── 1. Page loads ──────────────────────────────────────────────────────────
@@ -93,11 +58,13 @@ test.describe("Home Assistant Demo", () => {
   test("page loads and ha-demo mounts without JS errors", async () => {
     const page = sharedPage;
     // The custom element is present in the document
-    await expect(page.locator("ha-demo")).toBeAttached({ timeout: 30_000 });
+    await expect(page.locator("ha-demo")).toBeAttached({
+      timeout: NAVIGATION_TIMEOUT,
+    });
 
     // The launch screen should disappear once the app is ready
     await expect(page.locator("#ha-launch-screen")).toBeHidden({
-      timeout: 30_000,
+      timeout: NAVIGATION_TIMEOUT,
     });
 
     // No unhandled JS exceptions (excluding infra tunnel errors)
@@ -108,18 +75,14 @@ test.describe("Home Assistant Demo", () => {
 
   test("dashboard renders Lovelace cards", async () => {
     const page = sharedPage;
-    // Wait for the app shell to be ready
-    await expect(page.locator("ha-demo")).toBeAttached({ timeout: 30_000 });
+    await expect(page.locator("ha-demo")).toBeAttached({
+      timeout: NAVIGATION_TIMEOUT,
+    });
     await expect(page.locator("#ha-launch-screen")).toBeHidden({
-      timeout: 30_000,
+      timeout: NAVIGATION_TIMEOUT,
     });
 
-    // Lovelace cards are rendered inside the shadow DOM.
-    const viewOrCardSelector = [
-      "hui-masonry-view",
-      "hui-sections-view",
-      "hui-panel-view",
-      "hui-sidebar-view",
+    const cardSelector = [
       "hui-tile-card",
       "hui-entity-card",
       "hui-glance-card",
@@ -127,62 +90,65 @@ test.describe("Home Assistant Demo", () => {
       "hui-markdown-card",
     ].join(", ");
 
-    const result = await waitForLocator(page, viewOrCardSelector, "attached");
-    if (result === "skip") {
-      test.skip();
-      return;
-    }
-
-    // At least one card must be visible
-    const cards = page.locator(
-      "hui-tile-card, hui-entity-card, hui-glance-card, hui-button-card, hui-markdown-card"
+    await waitForOrSkip(
+      page,
+      cardSelector,
+      "attached",
+      PANEL_TIMEOUT,
+      pageErrors
     );
-    await expect(cards.first()).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator(cardSelector).first()).toBeVisible({
+      timeout: NAVIGATION_TIMEOUT,
+    });
   });
 
   // ── 3. Sidebar navigation ─────────────────────────────────────────────────
 
   test("sidebar navigation changes the active panel", async () => {
     const page = sharedPage;
-    await expect(page.locator("ha-demo")).toBeAttached({ timeout: 30_000 });
+    await expect(page.locator("ha-demo")).toBeAttached({
+      timeout: NAVIGATION_TIMEOUT,
+    });
     await expect(page.locator("#ha-launch-screen")).toBeHidden({
-      timeout: 30_000,
+      timeout: NAVIGATION_TIMEOUT,
     });
 
     // On narrow viewports (< 870 px — mobile / tablet) the sidebar lives
-    // inside a modal drawer that is closed by default.  Open it first via
+    // inside a modal drawer that is closed by default. Open it first via
     // the ha-menu-button in the top app-bar.
     const menuButton = page.locator("ha-menu-button");
     if (await menuButton.isVisible()) {
       await menuButton.click();
-      // Wait for the drawer animation to complete so sidebar items are visible.
-      const r1 = await waitForLocator(page, "ha-sidebar", "visible", 15_000);
-      if (r1 === "skip") {
-        test.skip();
-        return;
-      }
+      await waitForOrSkip(
+        page,
+        "ha-sidebar",
+        "visible",
+        SHELL_TIMEOUT,
+        pageErrors
+      );
     } else {
-      // On wide viewports the sidebar is always rendered.
-      const r1 = await waitForLocator(page, "ha-sidebar", "attached", 30_000);
-      if (r1 === "skip") {
-        test.skip();
-        return;
-      }
+      await waitForOrSkip(
+        page,
+        "ha-sidebar",
+        "attached",
+        NAVIGATION_TIMEOUT,
+        pageErrors
+      );
     }
 
     const candidatePanels = ["map", "logbook", "history", "config"];
-    let clicked = false;
-
-    // Wait for at least one panel item to appear before probing visibility.
     const panelSelector = candidatePanels
       .map((p) => `#sidebar-panel-${p}`)
       .join(", ");
-    const r2 = await waitForLocator(page, panelSelector, "visible", 15_000);
-    if (r2 === "skip") {
-      test.skip();
-      return;
-    }
+    await waitForOrSkip(
+      page,
+      panelSelector,
+      "visible",
+      SHELL_TIMEOUT,
+      pageErrors
+    );
 
+    let clicked = false;
     for (const panel of candidatePanels) {
       const navItem = page.locator(`#sidebar-panel-${panel}`);
       // eslint-disable-next-line no-await-in-loop
@@ -192,7 +158,7 @@ test.describe("Home Assistant Demo", () => {
         await navItem.click();
         // eslint-disable-next-line no-await-in-loop
         await expect(page).toHaveURL(new RegExp(`/${panel}`), {
-          timeout: 15_000,
+          timeout: SHELL_TIMEOUT,
         });
         clicked = true;
         break;
@@ -207,42 +173,36 @@ test.describe("Home Assistant Demo", () => {
 
   test("clicking an entity card opens the more-info dialog", async () => {
     const page = sharedPage;
-    await expect(page.locator("ha-demo")).toBeAttached({ timeout: 30_000 });
+    await expect(page.locator("ha-demo")).toBeAttached({
+      timeout: NAVIGATION_TIMEOUT,
+    });
     await expect(page.locator("#ha-launch-screen")).toBeHidden({
-      timeout: 30_000,
+      timeout: NAVIGATION_TIMEOUT,
     });
 
     // Tile cards are the most common card type in the demo; they open the
-    // more-info dialog on click.  Fall back to other clickable card types in
+    // more-info dialog on click. Fall back to other clickable card types in
     // case the demo layout on this platform doesn't include tile cards.
-    const clickableCard = page
-      .locator(
-        "hui-tile-card, hui-entity-card, hui-button-card, hui-glance-card"
-      )
-      .first();
+    const cardSelector =
+      "hui-tile-card, hui-entity-card, hui-button-card, hui-glance-card";
 
-    const result = await waitForLocator(
+    await waitForOrSkip(
       page,
-      "hui-tile-card, hui-entity-card, hui-button-card, hui-glance-card",
+      cardSelector,
       "visible",
-      30_000
+      NAVIGATION_TIMEOUT,
+      pageErrors
     );
-    if (result === "skip") {
-      test.skip();
-      return;
-    }
-
-    await clickableCard.click();
+    await page.locator(cardSelector).first().click();
 
     // The more-info dialog is a top-level custom element appended to the body.
     // We verify it is attached, then confirm it rendered by checking the title
     // span which is slotted into the light DOM and has real layout dimensions.
     const dialog = page.locator("ha-more-info-dialog");
-    await expect(dialog).toBeAttached({ timeout: 15_000 });
+    await expect(dialog).toBeAttached({ timeout: SHELL_TIMEOUT });
 
-    // The title is a slotted <span> in the light DOM — visible and has size.
     const title = dialog.locator("span.title");
-    await expect(title).toBeVisible({ timeout: 10_000 });
+    await expect(title).toBeVisible({ timeout: QUICK_TIMEOUT });
 
     expect(appErrors()).toHaveLength(0);
   });

@@ -38,14 +38,6 @@ const customThemeScenario: Scenario = async (hass) => {
   });
 };
 
-const historyPanelScenario: Scenario = async (_hass) => {
-  // Navigation happens after hassConnected — handled by Playwright via URL
-};
-
-const configPanelScenario: Scenario = async (_hass) => {
-  // Navigation handled by Playwright via URL
-};
-
 const lightMoreInfoScenario: Scenario = async (hass) => {
   // Make sure we have a light entity available (sections config adds them, but
   // this ensures it exists synchronously for tests that load mid-init).
@@ -73,7 +65,5 @@ export const scenarios: Record<string, Scenario> = {
   "non-admin": nonAdminScenario,
   "dark-theme": darkThemeScenario,
   "custom-theme": customThemeScenario,
-  "history-panel": historyPanelScenario,
-  "config-panel": configPanelScenario,
   "light-more-info": lightMoreInfoScenario,
 };

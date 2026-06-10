@@ -9,6 +9,14 @@ on:
     branches:
       - dev
       - master
+  # BrowserStack runs are gated by the `e2e-browserstack` label or manual
+  # dispatch — see the e2e-browserstack job below. Local Chromium always runs.
+  workflow_dispatch:
+    inputs:
+      run-browserstack:
+        description: "Run BrowserStack suite"
+        type: boolean
+        default: true
 
 env:
   NODE_OPTIONS: --max_old_space_size=6144
@@ -122,6 +130,10 @@ jobs:
     name: E2E (local Chromium)
     needs: [build-demo, build-e2e-test-app, build-gallery]
     runs-on: ubuntu-latest
+    # Fail fast if anything hangs. The whole suite should take < 15 minutes on
+    # Chromium; anything longer is almost certainly an install or webServer
+    # hang.
+    timeout-minutes: 30
     steps:
       - name: Check out files from GitHub
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -139,6 +151,7 @@ jobs:
 
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
+        timeout-minutes: 10
 
       - name: Download demo build
         uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
@@ -160,6 +173,7 @@ jobs:
 
       - name: Run Playwright tests (local)
         run: yarn test:e2e
+        timeout-minutes: 15
 
       - name: Upload blob report
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -172,10 +186,18 @@ jobs:
   # ── Run Playwright tests on BrowserStack (real devices + browsers) ─────────
   # The BrowserStack SDK manages the Local tunnel and uploads results to the
   # BrowserStack Automate dashboard automatically — no tunnel action needed.
+  #
+  # Gated on:
+  #   - manual dispatch with the run-browserstack input enabled, OR
+  #   - a PR with the `e2e-browserstack` label applied.
+  # This keeps CI fast on normal PRs while still allowing on-demand runs.
   e2e-browserstack:
     name: E2E (BrowserStack)
     needs: [build-demo, build-e2e-test-app, build-gallery]
     runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'workflow_dispatch' && inputs.run-browserstack) ||
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'e2e-browserstack'))
     environment: browserstack
     env:
       BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
@@ -217,9 +239,11 @@ jobs:
         run: yarn test:e2e:browserstack
 
   # ── Merge local blob reports and post PR comment ───────────────────────────
+  # Only depends on the local job — BrowserStack reports live on the
+  # BrowserStack Automate dashboard and don't feed into the local blob report.
   report:
     name: Report
-    needs: [e2e-local, e2e-browserstack]
+    needs: [e2e-local]
     runs-on: ubuntu-latest
     if: always()
     permissions:

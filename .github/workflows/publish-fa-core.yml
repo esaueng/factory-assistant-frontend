@@ -1,0 +1,80 @@
+name: Publish Factory Assistant Core image
+
+# Builds the rebranded frontend, packages it as the home-assistant-frontend
+# wheel (version matched to the base Core's pin so the frontend integration
+# loads), bakes it into a Core image, and pushes to ghcr.io/esaueng.
+# Uses the built-in GITHUB_TOKEN (packages: write) — no local/PAT auth needed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      base:
+        description: "Upstream Core base image"
+        default: "ghcr.io/home-assistant/home-assistant:dev"
+      tag:
+        description: "Tag to publish under ghcr.io/esaueng/generic-x86-64-homeassistant"
+        default: "dev"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+
+      - name: Install frontend deps
+        run: yarn install --immutable
+
+      - name: Build frontend (rebranded)
+        run: yarn build
+
+      - name: Build wheel, version-matched to the base Core's frontend pin
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet build
+          docker pull "${{ inputs.base }}"
+          V=$(docker run --rm "${{ inputs.base }}" python3 -c "import importlib.metadata as m; print(m.version('home-assistant-frontend'))")
+          echo "Base Core expects home-assistant-frontend==$V"
+          python3 - "$V" <<'PY'
+          import re, sys, pathlib
+          v = sys.argv[1]
+          p = pathlib.Path("pyproject.toml")
+          p.write_text(re.sub(r'version\s*=\s*"[^"]+"', f'version = "{v}"', p.read_text(), count=1))
+          PY
+          python3 -m build --wheel
+          ls -lh dist/*.whl
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push Factory Assistant Core image (amd64)
+        run: |
+          set -euo pipefail
+          cat > Dockerfile.facore <<'EOF'
+          # syntax=docker/dockerfile:1
+          ARG BASE
+          FROM ${BASE}
+          COPY dist/ /tmp/fa-dist/
+          RUN python3 -m pip install --no-cache-dir --no-deps --force-reinstall \
+                  --ignore-requires-python /tmp/fa-dist/*.whl \
+           && python3 -c "import hass_frontend, os; print('FA frontend baked in:', os.path.exists(os.path.join(os.path.dirname(hass_frontend.__file__), 'index.html')))" \
+           && rm -rf /tmp/fa-dist
+          EOF
+          IMG=ghcr.io/esaueng/generic-x86-64-homeassistant
+          docker buildx build --platform linux/amd64 \
+            --build-arg BASE="${{ inputs.base }}" \
+            -f Dockerfile.facore \
+            -t "$IMG:${{ inputs.tag }}" --push .
+          echo "Published $IMG:${{ inputs.tag }} (linux/amd64)"

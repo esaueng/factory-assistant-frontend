@@ -4488,7 +4488,7 @@
           "copy_raw": "Raw text",
           "copy_github": "For GitHub",
           "description": "Version, loaded integrations and links to documentation",
-          "home_assistant_logo": "Home Assistant logo",
+          "home_assistant_logo": "Factory Assistant logo",
           "developed_by": "Developed by a bunch of awesome people.",
           "license": "Published under the Apache 2.0 license",
           "source": "Source:",
@@ -11256,18 +11256,18 @@
     }
   },
   "landing-page": {
-    "header": "Preparing Home Assistant",
-    "subheader": "The latest version of Home Assistant is being downloaded. This may take 20 minutes or more.",
+    "header": "Preparing Factory Assistant",
+    "subheader": "The latest version of Factory Assistant is being downloaded. This may take 20 minutes or more.",
     "show_details": "Show details",
     "hide_details": "Hide details",
     "network_issue": {
       "title": "Networking issue detected",
       "error_get_network_info": "Cannot get network information",
-      "description": "Home Assistant OS detected a networking issue in your setup. As part of the initial setup, Home Assistant OS downloads the latest version of Home Assistant Core. This networking issue prevents this download. The network issue might be DNS related. The currently used DNS service is: {dns}.",
+      "description": "Factory Assistant OS detected a networking issue in your setup. As part of the initial setup, Factory Assistant OS downloads the latest version of Factory Assistant Core. This networking issue prevents this download. The network issue might be DNS related. The currently used DNS service is: {dns}.",
       "resolve_different": "To resolve this, you can try a different DNS server. Select one of the options below. Alternatively, change your router configuration to use your own custom DNS server.",
       "use_cloudflare": "Use Cloudflare DNS",
       "use_google": "Use Google DNS",
-      "no_primary_interface": "Home Assistant OS wasn't able to detect a primary network interface, so you cannot define a DNS server!",
+      "no_primary_interface": "Factory Assistant OS wasn't able to detect a primary network interface, so you cannot define a DNS server!",
       "failed": "Failed",
       "set_dns_failed": "An error occurred while setting the DNS server. Please check the logs for more information and try again.",
       "error": "Error",
@@ -11279,8 +11279,8 @@
       "retry": "Retry",
       "download_logs": "[%key:ui::panel::config::logs::download_logs%]"
     },
-    "error_title": "Error installing Home Assistant",
-    "error_description": "An error occurred while installing Home Assistant. Please check the logs for more information.",
+    "error_title": "Error installing Factory Assistant",
+    "error_description": "An error occurred while installing Factory Assistant. Please check the logs for more information.",
     "ui": {
       "panel": {
         "page-onboarding": {

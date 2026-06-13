@@ -29,7 +29,7 @@ class DialogCommunity extends DialogMixin<CommunityDialogParams>(LitElement) {
           <img
             src="/static/icons/favicon-192x192.png"
             slot="start"
-            alt="Home Assistant Logo"
+            alt="Factory Assistant Logo"
           />
           <span slot="headline">
             ${this.params.localize("ui.panel.page-onboarding.welcome.forums")}

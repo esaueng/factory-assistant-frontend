@@ -4514,7 +4514,10 @@
             "feature": "Feature requests",
             "bug": "Bug reports",
             "help": "Help",
-            "license": "License"
+            "license": "License",
+            "source": "Factory Assistant source",
+            "safety_boundary": "Safety boundary",
+            "open_source_licenses": "Open source licenses"
           },
           "shortcuts": "Shortcuts"
         },

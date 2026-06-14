@@ -34,7 +34,9 @@ everything else tracks upstream so upstream releases keep merging cleanly.
 - **Industrial setup wizard** adds a native onboarding checkpoint between Core
   config and integrations for site identity, line/cell/machine modeling,
   NTP/static-IP posture, Mosquitto readiness, local-first defaults, and the
-  Plant overview/Andon/Wallboard dashboard handoff.
+  Plant overview/Andon/Wallboard dashboard handoff. The step records a
+  monitoring-only handoff payload in frontend system data under
+  `factory_assistant_onboarding` before integrations run.
 - **Local-first onboarding welcome** removes the default Home Assistant Cloud
   restore option, removes the upstream companion-app download card, and points
   onboarding community/help links at esaueng-owned Factory Assistant source and

@@ -33,6 +33,19 @@ export interface EnergyFrontendSystemData {
   hidden_cards?: string[];
 }
 
+export interface FactoryAssistantOnboardingSystemData {
+  site_name: string;
+  line_name: string;
+  cell_name: string;
+  ntp_source?: string;
+  static_ip_plan?: string;
+  mosquitto_broker: boolean;
+  local_first_confirmed: boolean;
+  dashboard_seed_confirmed: boolean;
+  safety_acknowledged: boolean;
+  recorded_at: string;
+}
+
 declare global {
   interface FrontendUserData {
     core: CoreFrontendUserData;
@@ -42,6 +55,7 @@ declare global {
     core: CoreFrontendSystemData;
     home: HomeFrontendSystemData;
     energy: EnergyFrontendSystemData;
+    factory_assistant_onboarding: FactoryAssistantOnboardingSystemData;
   }
 }
 

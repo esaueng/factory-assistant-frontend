@@ -16,11 +16,19 @@ jobs:
     name: Upload stats (frontend/modern)
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    env:
+      RELATIVE_CI_KEY_frontend_modern: ${{ secrets.RELATIVE_CI_KEY_frontend_modern }}
+      RELATIVE_CI_KEY: ${{ secrets.RELATIVE_CI_KEY_frontend_modern }}
     steps:
+      - name: Skip RelativeCI upload when key is not configured
+        if: ${{ env.RELATIVE_CI_KEY == '' }}
+        run: echo "RELATIVE_CI_KEY_frontend_modern is not configured; skipping RelativeCI upload."
+
       - name: Send bundle stats and build information to RelativeCI
+        if: ${{ env.RELATIVE_CI_KEY != '' }}
         uses: relative-ci/agent-action@fcf45416581928e8dd62eded78ce98c78e5149f8 # v3.2.3
         with:
-          key: ${{ secrets.RELATIVE_CI_KEY_frontend_modern }}
+          key: ${{ env.RELATIVE_CI_KEY }}
           token: ${{ github.token }}
           artifactName: frontend-bundle-stats
           webpackStatsFile: frontend-modern.json
@@ -29,11 +37,19 @@ jobs:
     name: Upload stats (frontend/legacy)
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    env:
+      RELATIVE_CI_KEY_frontend_legacy: ${{ secrets.RELATIVE_CI_KEY_frontend_legacy }}
+      RELATIVE_CI_KEY: ${{ secrets.RELATIVE_CI_KEY_frontend_legacy }}
     steps:
+      - name: Skip RelativeCI upload when key is not configured
+        if: ${{ env.RELATIVE_CI_KEY == '' }}
+        run: echo "RELATIVE_CI_KEY_frontend_legacy is not configured; skipping RelativeCI upload."
+
       - name: Send bundle stats and build information to RelativeCI
+        if: ${{ env.RELATIVE_CI_KEY != '' }}
         uses: relative-ci/agent-action@fcf45416581928e8dd62eded78ce98c78e5149f8 # v3.2.3
         with:
-          key: ${{ secrets.RELATIVE_CI_KEY_frontend_legacy }}
+          key: ${{ env.RELATIVE_CI_KEY }}
           token: ${{ github.token }}
           artifactName: frontend-bundle-stats
           webpackStatsFile: frontend-legacy.json

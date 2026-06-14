@@ -31,6 +31,7 @@ const landingPageSource = readText("landing-page/src/ha-landing-page.ts");
 const landingPageTemplate = readText(
   "landing-page/src/html/index.html.template"
 );
+const relativeCiWorkflow = readText(".github/workflows/relative-ci.yaml");
 const factoryNotes = readText("FACTORY_ASSISTANT.md");
 
 const readBytes = (path) => readFileSync(join(root, path));
@@ -302,6 +303,30 @@ assert(
 assert(
   /About panel\s+contract/.test(factoryNotes),
   "FACTORY_ASSISTANT.md does not document the About panel contract cleanup"
+);
+
+for (const secretName of [
+  "RELATIVE_CI_KEY_frontend_modern",
+  "RELATIVE_CI_KEY_frontend_legacy",
+]) {
+  assert(
+    relativeCiWorkflow.includes(`${secretName}: \${{ secrets.${secretName} }}`),
+    `RelativeCI workflow must map ${secretName} into job env`
+  );
+  assert(
+    relativeCiWorkflow.includes(
+      `${secretName} is not configured; skipping RelativeCI upload.`
+    ),
+    `RelativeCI workflow must explain skipped upload when ${secretName} is missing`
+  );
+}
+
+const relativeCiGuardCount = (
+  relativeCiWorkflow.match(/if: \$\{\{ env\.RELATIVE_CI_KEY != '' \}\}/g) || []
+).length;
+assert(
+  relativeCiGuardCount === 2,
+  "RelativeCI upload steps must be guarded when RELATIVE_CI_KEY is missing"
 );
 
 if (errors.length) {

@@ -49,10 +49,11 @@ import "./user/ha-user-badge";
 
 const SORT_VALUE_URL_PATHS = {
   energy: 1,
-  map: 2,
+  history: 2,
   logbook: 3,
-  history: 4,
 };
+
+const FACTORY_ASSISTANT_HIDDEN_BY_DEFAULT = ["map", "media-browser", "todo"];
 
 const panelSorter = (
   reverseSort: string[],
@@ -141,6 +142,8 @@ export const computePanels = memoizeOne(
         (!panel.title ||
           panel.show_in_sidebar === false ||
           hiddenPanels.includes(panel.url_path) ||
+          (FACTORY_ASSISTANT_HIDDEN_BY_DEFAULT.includes(panel.url_path) &&
+            !panelsOrder.includes(panel.url_path)) ||
           (panel.default_visible === false &&
             !panelsOrder.includes(panel.url_path)))
       ) {

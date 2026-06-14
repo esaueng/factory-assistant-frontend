@@ -43,6 +43,10 @@ everything else tracks upstream so upstream releases keep merging cleanly.
   non-affiliation notice, monitoring-only safety disclaimer, and links to the
   Factory Assistant safety boundary and open source license guidance instead of
   upstream Home Assistant project destinations.
+- **Native plant navigation** trims the default sidebar toward the factory
+  contract: Plant overview stays first, Energy/History/Logbook use the
+  industrial priority order, and home-centric Map/Media/To-do panels stay
+  hidden by default unless a user explicitly opts them back into the sidebar.
 - **Native fa-machine-card** is bundled for Factory Assistant dashboards as
   `type: custom:fa-machine-card`. It renders machine status, OEE, current job,
   maintenance state, freshness thresholds, and a detail-only more-info tap path

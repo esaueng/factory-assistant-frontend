@@ -29,6 +29,7 @@ const communityDialogSource = readText(
 );
 const configInfoSource = readText("src/panels/config/info/ha-config-info.ts");
 const configInfoText = configInfoSource.replace(/\s+/g, " ");
+const sidebarSource = readText("src/components/ha-sidebar.ts");
 const landingPageSource = readText("landing-page/src/ha-landing-page.ts");
 const landingPageTemplate = readText(
   "landing-page/src/html/index.html.template"
@@ -314,6 +315,33 @@ assert(
 assert(
   /About panel\s+contract/.test(factoryNotes),
   "FACTORY_ASSISTANT.md does not document the About panel contract cleanup"
+);
+
+const sidebarSortBlock =
+  sidebarSource.match(/const SORT_VALUE_URL_PATHS = \{([\s\S]*?)\};/)?.[1] ??
+  "";
+const sidebarHiddenBlock =
+  sidebarSource.match(
+    /const FACTORY_ASSISTANT_HIDDEN_BY_DEFAULT = \[([\s\S]*?)\];/
+  )?.[1] ?? "";
+assert(
+  sidebarSource.includes("FACTORY_ASSISTANT_HIDDEN_BY_DEFAULT") &&
+    sidebarHiddenBlock.includes('"map"') &&
+    sidebarHiddenBlock.includes('"media-browser"') &&
+    sidebarHiddenBlock.includes('"todo"') &&
+    sidebarSource.includes("!panelsOrder.includes(panel.url_path)"),
+  "Factory Assistant sidebar must hide home-centric map/media/to-do panels by default while allowing explicit opt-in"
+);
+assert(
+  sidebarSortBlock.includes("energy: 1") &&
+    sidebarSortBlock.includes("history: 2") &&
+    sidebarSortBlock.includes("logbook: 3") &&
+    !sidebarSortBlock.includes("map"),
+  "Factory Assistant sidebar must prioritize Energy, History, and Logbook without default Map priority"
+);
+assert(
+  /Native plant navigation/.test(factoryNotes),
+  "FACTORY_ASSISTANT.md does not document the native plant navigation cleanup"
 );
 
 assert(machineCardSource, "Missing native fa-machine-card implementation");

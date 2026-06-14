@@ -22,6 +22,41 @@ class OnboardingWelcome extends LitElement {
       <h1>${this.localize("ui.panel.page-onboarding.welcome.header")}</h1>
       <p>${this.localize("ui.panel.page-onboarding.intro")}</p>
 
+      <section
+        class="industrial-readiness"
+        aria-label=${this.localize(
+          "ui.panel.page-onboarding.industrial_readiness.aria_label"
+        )}
+      >
+        <h2>
+          ${this.localize(
+            "ui.panel.page-onboarding.industrial_readiness.title"
+          )}
+        </h2>
+        <ul class="readiness-list">
+          <li>
+            ${this.localize(
+              "ui.panel.page-onboarding.industrial_readiness.site_line_cell"
+            )}
+          </li>
+          <li>
+            ${this.localize(
+              "ui.panel.page-onboarding.industrial_readiness.network_time"
+            )}
+          </li>
+          <li>
+            ${this.localize(
+              "ui.panel.page-onboarding.industrial_readiness.mqtt_broker"
+            )}
+          </li>
+          <li>
+            ${this.localize(
+              "ui.panel.page-onboarding.industrial_readiness.local_first"
+            )}
+          </li>
+        </ul>
+      </section>
+
       <ha-button @click=${this._start} class="start">
         ${this.localize("ui.panel.page-onboarding.welcome.start")}
       </ha-button>
@@ -98,6 +133,30 @@ class OnboardingWelcome extends LitElement {
         }
         p {
           margin: 0;
+        }
+        .industrial-readiness {
+          width: 100%;
+          box-sizing: border-box;
+          margin-top: var(--ha-space-6);
+          padding-inline-start: var(--ha-space-4);
+          border-inline-start: 3px solid var(--primary-color);
+        }
+        .industrial-readiness h2 {
+          margin: 0 0 var(--ha-space-2);
+          font-size: 1rem;
+          font-weight: var(--ha-font-weight-medium);
+          line-height: 1.4;
+        }
+        .readiness-list {
+          margin: 0;
+          padding-inline-start: var(--ha-space-5);
+        }
+        .readiness-list li {
+          margin-bottom: var(--ha-space-2);
+          line-height: 1.4;
+        }
+        .readiness-list li:last-child {
+          margin-bottom: 0;
         }
         .start {
           margin: var(--ha-space-8) 0;

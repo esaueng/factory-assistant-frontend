@@ -21,6 +21,11 @@ everything else tracks upstream so upstream releases keep merging cleanly.
   `branding/assets/README.md` spec.
 - **Onboarding / landing-page** "Preparing/installing" strings and the About
   logo alt text (`src/translations/en.json`).
+- **Initial onboarding** now includes an industrial onboarding readiness panel
+  covering site/line/cell setup, plant NTP and static-IP planning, Mosquitto
+  availability, and the local-first default where cloud and analytics stay off
+  unless a site owner enables them. This is the visible P3 bridge, not the full
+  backend-driven industrial setup wizard.
 - **Removed** the Open Home Foundation launch-screen badge and the Home
   Assistant Companion App Store smart-banner (HA-specific brand surfaces).
 

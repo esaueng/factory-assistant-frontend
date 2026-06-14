@@ -42,6 +42,8 @@ const machineCardPath = "src/panels/lovelace/cards/fa-machine-card.ts";
 const machineCardSource = readOptionalText(machineCardPath);
 const andonViewPath = "src/panels/lovelace/cards/fa-andon-view.ts";
 const andonViewSource = readOptionalText(andonViewPath);
+const kioskPath = "src/panels/lovelace/cards/factory-wallboard-kiosk.ts";
+const kioskSource = readOptionalText(kioskPath);
 
 const readBytes = (path) => readFileSync(join(root, path));
 const sha256 = (path) =>
@@ -411,6 +413,58 @@ assert(
 assert(
   /Native\s+fa-andon-view/.test(factoryNotes),
   "FACTORY_ASSISTANT.md does not document the native fa-andon-view"
+);
+
+assert(kioskSource, "Missing native factory-wallboard-kiosk implementation");
+assert(
+  kioskSource.includes('@customElement("factory-wallboard-kiosk")'),
+  "factory-wallboard-kiosk must register the contract custom element"
+);
+assert(
+  kioskSource.includes("hide_sidebar") &&
+    kioskSource.includes("hide_header") &&
+    kioskSource.includes("type_scale") &&
+    kioskSource.includes("view_only"),
+  "factory-wallboard-kiosk must encode the kiosk contract flags"
+);
+assert(
+  kioskSource.includes("factory-assistant-kiosk") &&
+    kioskSource.includes("--fa-kiosk-type-scale"),
+  "factory-wallboard-kiosk must apply a document-level kiosk mode marker and type scale"
+);
+assert(
+  kioskSource.includes("ha-sidebar") &&
+    kioskSource.includes("app-toolbar") &&
+    kioskSource.includes("pointer-events: none"),
+  "factory-wallboard-kiosk must hide chrome and disable dashboard interaction"
+);
+assert(
+  kioskSource.includes(
+    "Factory Assistant is a monitoring tool, not a safety device."
+  ),
+  "factory-wallboard-kiosk must render the monitoring-only safety disclaimer"
+);
+for (const forbidden of [
+  "callService",
+  "handleAction",
+  "actionHandler",
+  "turn_on",
+  "turn_off",
+  "e-stop",
+  "interlock",
+]) {
+  assert(
+    !kioskSource.includes(forbidden),
+    `factory-wallboard-kiosk must not expose control/safety affordance: ${forbidden}`
+  );
+}
+assert(
+  cardElementSource.includes('import "../cards/factory-wallboard-kiosk";'),
+  "create-card-element must import factory-wallboard-kiosk so custom:factory-wallboard-kiosk is bundled"
+);
+assert(
+  /Native\s+factory-wallboard-kiosk/.test(factoryNotes),
+  "FACTORY_ASSISTANT.md does not document the native factory-wallboard-kiosk"
 );
 
 for (const secretName of [

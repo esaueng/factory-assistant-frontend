@@ -11095,8 +11095,8 @@
           "delete": "[%key:ui::common::delete%]",
           "uploading": "[%key:ui::components::file-upload::uploading%]",
           "details": {
-            "home_assistant_missing": "This backup does not include your Home Assistant configuration, you cannot use it to restore your instance.",
-            "apps_unsupported": "Your installation method doesn’t support apps. If you want to restore these, you have to install Home Assistant OS",
+            "home_assistant_missing": "This backup does not include your Factory Assistant configuration, you cannot use it to restore your instance.",
+            "apps_unsupported": "Your installation method doesn’t support apps. If you want to restore these, you have to install Factory Assistant OS",
             "summary": {
               "created": "[%key:ui::panel::config::backup::details::summary::created%]",
               "content": "Content"
@@ -11122,9 +11122,9 @@
             "apps": "[%key:ui::panel::config::backup::data_picker::apps%]",
             "ssl": "[%key:ui::panel::config::backup::data_picker::ssl%]"
           },
-          "restore_no_home_assistant": "Backup does not contain Home Assistant data. To restore Home Assistant you need a backup of Home Assistant Core.",
+          "restore_no_home_assistant": "Backup does not contain Factory Assistant data. To restore Factory Assistant you need a backup of Factory Assistant Core.",
           "in_progress": "Restore in progress",
-          "in_progress_description": "The restore process is running in the background. Home Assistant will automatically start again once the restore is complete. Please be patient, this can take a while. Do not close or refresh this page.",
+          "in_progress_description": "The restore process is running in the background. Factory Assistant will automatically start again once the restore is complete. Please be patient, this can take a while. Do not close or refresh this page.",
           "failed": "Restore failed",
           "failed_status_description": "The backup could not be restored. Please try again.",
           "failed_description": "The last restore attempt failed. Please try it again.",
@@ -11143,9 +11143,9 @@
           "password": "Backup encryption key",
           "confirm_password": "Confirm encryption key",
           "confirm_restore_partial_backup_title": "Restore partial backup",
-          "confirm_restore_partial_backup_text": "The backup will be restored. Depending on the size of the backup, this can take up to 45 min. Home Assistant needs to shut down and the restore progress is running in the background. If it succeeds, Home Assistant will automatically start again and you see the login screen. If it fails it will bring you back to the onboarding.",
+          "confirm_restore_partial_backup_text": "The backup will be restored. Depending on the size of the backup, this can take up to 45 min. Factory Assistant needs to shut down and the restore progress is running in the background. If it succeeds, Factory Assistant will automatically start again and you see the login screen. If it fails it will bring you back to the onboarding.",
           "confirm_restore_full_backup_title": "Restore full backup",
-          "confirm_restore_full_backup_text": "Depending on the size of the backup, this can take up to 45 minutes. Home Assistant will restart and you will see the login screen when it’s restored.",
+          "confirm_restore_full_backup_text": "Depending on the size of the backup, this can take up to 45 minutes. Factory Assistant will restart and you will see the login screen when it’s restored.",
           "restore": "Restore",
           "close": "[%key:ui::common::close%]",
           "cancel": "[%key:ui::common::cancel%]",
@@ -11202,14 +11202,14 @@
           },
           "options": {
             "title": "How to restore?",
-            "upload_description": "Upload and restore a Home Assistant backup to this system"
+            "upload_description": "Upload and restore a Factory Assistant backup to this system"
           }
         }
       },
       "custom": {
         "external_panel": {
           "question_trust": "Do you trust the external panel {name} at {link}?",
-          "complete_access": "It will have access to all data in Home Assistant.",
+          "complete_access": "It will have access to all data in Factory Assistant.",
           "hide_message": "Check docs for the 'Custom panel' integration to hide this message"
         }
       },

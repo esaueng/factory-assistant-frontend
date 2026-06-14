@@ -25,6 +25,8 @@ const welcomeLinksSource = readText(
 const communityDialogSource = readText(
   "src/onboarding/dialogs/community-dialog.ts"
 );
+const configInfoSource = readText("src/panels/config/info/ha-config-info.ts");
+const configInfoText = configInfoSource.replace(/\s+/g, " ");
 const landingPageSource = readText("landing-page/src/ha-landing-page.ts");
 const landingPageTemplate = readText(
   "landing-page/src/html/index.html.template"
@@ -205,6 +207,62 @@ assert(
 assert(
   /landing-page source\s+links/.test(factoryNotes),
   "FACTORY_ASSISTANT.md does not document the landing-page source link rebrand"
+);
+assert(
+  configInfoSource.includes("Factory Assistant is based on Home Assistant."),
+  "About page must render canonical upstream attribution"
+);
+assert(
+  configInfoText.includes("Factory Assistant is not affiliated with") &&
+    configInfoText.includes("Open Home Foundation"),
+  "About page must render the non-affiliation notice"
+);
+assert(
+  configInfoSource.includes("monitoring tool, not a safety device"),
+  "About page must render the monitoring-only safety disclaimer"
+);
+assert(
+  configInfoSource.includes(
+    "https://github.com/esaueng/factoryassistant-os/blob/main/docs/SAFETY_BOUNDARY.md"
+  ),
+  "About page must link to the Factory Assistant safety boundary"
+);
+assert(
+  configInfoSource.includes(
+    "https://github.com/esaueng/factoryassistant-os/blob/main/docs/LICENSE_COMPLIANCE.md"
+  ),
+  "About page must link to Factory Assistant open source license guidance"
+);
+assert(
+  configInfoSource.includes('name: "safety_boundary"') &&
+    configInfoSource.includes('name: "open_source_licenses"'),
+  "About page must expose the required safety and license link items"
+);
+assert(
+  !configInfoSource.includes("/developers/license/") &&
+    !configInfoSource.includes("/developers/credits/") &&
+    !configInfoSource.includes("/merch") &&
+    !configInfoSource.includes("/feature-requests") &&
+    !configInfoSource.includes("/issues") &&
+    !configInfoSource.includes("/community"),
+  "About page still carries upstream Home Assistant/OHF project links"
+);
+assert(
+  !configInfoSource.includes("documentationUrl(this.hass"),
+  "About page still derives links from upstream Home Assistant documentation"
+);
+assert(
+  translations.ui.panel.config.info.items.safety_boundary === "Safety boundary",
+  "About page safety boundary label must be Factory Assistant-branded"
+);
+assert(
+  translations.ui.panel.config.info.items.open_source_licenses ===
+    "Open source licenses",
+  "About page open source licenses label must be Factory Assistant-branded"
+);
+assert(
+  /About panel\s+contract/.test(factoryNotes),
+  "FACTORY_ASSISTANT.md does not document the About panel contract cleanup"
 );
 
 if (errors.length) {

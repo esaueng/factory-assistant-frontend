@@ -1,12 +1,9 @@
 import {
-  mdiBug,
   mdiFileDocument,
-  mdiHandsPray,
-  mdiHelp,
   mdiKeyboard,
-  mdiNewspaperVariant,
   mdiOpenInNew,
-  mdiTshirtCrew,
+  mdiShieldCheck,
+  mdiSourceRepository,
 } from "@mdi/js";
 import type { CSSResultGroup, TemplateResult, PropertyValues } from "lit";
 import { LitElement, css, html, nothing } from "lit";
@@ -24,60 +21,34 @@ import { fetchHassioInfo } from "../../../data/hassio/supervisor";
 import { subscribeSystemHealthInfo } from "../../../data/system_health";
 import { showShortcutsDialog } from "../../../dialogs/shortcuts/show-shortcuts-dialog";
 import "../../../layouts/hass-subpage";
-import { mdiHomeAssistant } from "../../../resources/home-assistant-logo-svg";
 import { haStyle } from "../../../resources/styles";
 import type { HomeAssistant, Route } from "../../../types";
-import { documentationUrl } from "../../../util/documentation-url";
 
 const JS_TYPE = __BUILD__;
 const JS_VERSION = __VERSION__;
 
 const PAGES = [
   {
-    name: "change_log",
-    path: "/latest-release-notes/",
-    iconPath: mdiNewspaperVariant,
+    name: "source",
+    href: "https://github.com/esaueng/factoryassistant-os",
+    iconPath: mdiSourceRepository,
     iconColor: "#4A5963",
   },
   {
-    name: "thanks",
-    path: "/developers/credits/",
-    iconPath: mdiHandsPray,
-    iconColor: "#3B808E",
-  },
-  {
-    name: "merch",
-    path: "/merch",
-    iconPath: mdiTshirtCrew,
-    iconColor: "#C65326",
-  },
-  {
-    name: "feature",
-    path: "/feature-requests",
-    iconPath: mdiHomeAssistant,
-    iconColor: "#0D47A1",
-  },
-  {
-    name: "bug",
-    path: "/issues",
-    iconPath: mdiBug,
+    name: "safety_boundary",
+    href: "https://github.com/esaueng/factoryassistant-os/blob/main/docs/SAFETY_BOUNDARY.md",
+    iconPath: mdiShieldCheck,
     iconColor: "#F1C447",
   },
   {
-    name: "help",
-    path: "/community",
-    iconPath: mdiHelp,
-    iconColor: "#B1345C",
-  },
-  {
-    name: "license",
-    path: "/developers/license/",
+    name: "open_source_licenses",
+    href: "https://github.com/esaueng/factoryassistant-os/blob/main/docs/LICENSE_COMPLIANCE.md",
     iconPath: mdiFileDocument,
     iconColor: "#518C43",
   },
 ] as const satisfies readonly {
   name: string;
-  path: string;
+  href: string;
   iconPath: string;
   iconColor: string;
 }[];
@@ -113,7 +84,7 @@ class HaConfigInfo extends LitElement {
         <div class="content">
           <ha-card outlined class="header">
             <a
-              href=${documentationUrl(this.hass, "")}
+              href="https://github.com/esaueng/factoryassistant-os"
               target="_blank"
               rel="noreferrer"
             >
@@ -125,6 +96,18 @@ class HaConfigInfo extends LitElement {
               </ha-logo-svg>
             </a>
             <p>Factory Assistant</p>
+            <p class="attribution">
+              Factory Assistant is based on Home Assistant.
+            </p>
+            <p class="notice">
+              Factory Assistant is not affiliated with Home Assistant, the Open
+              Home Foundation, or Nabu Casa.
+            </p>
+            <p class="notice">
+              Factory Assistant is a monitoring tool, not a safety device.
+              Dashboards and notifications must never be the sole means of
+              detecting a hazardous condition.
+            </p>
             <ul class="versions">
               <li>
                 <span class="version-label"
@@ -201,7 +184,7 @@ class HaConfigInfo extends LitElement {
               ${PAGES.map(
                 (page) => html`
                   <ha-list-item-button
-                    .href=${documentationUrl(this.hass, page.path)}
+                    .href=${page.href}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -316,7 +299,16 @@ class HaConfigInfo extends LitElement {
           font-weight: var(--ha-font-weight-normal);
           line-height: var(--ha-line-height-condensed);
           text-align: center;
-          margin: 24px;
+          margin: 16px 24px;
+        }
+
+        .header .attribution,
+        .header .notice {
+          max-width: 460px;
+          color: var(--secondary-text-color);
+          font-size: var(--ha-font-size-m);
+          line-height: var(--ha-line-height-expanded);
+          margin: 0 24px 12px;
         }
 
         .versions {

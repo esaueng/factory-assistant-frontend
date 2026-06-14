@@ -35,6 +35,10 @@ everything else tracks upstream so upstream releases keep merging cleanly.
   restore option, removes the upstream companion-app download card, and points
   onboarding community/help links at esaueng-owned Factory Assistant source and
   docs instead of upstream Home Assistant or OHF destinations.
+- **About panel contract** adds the required Factory Assistant attribution,
+  non-affiliation notice, monitoring-only safety disclaimer, and links to the
+  Factory Assistant safety boundary and open source license guidance instead of
+  upstream Home Assistant project destinations.
 - **Removed** the Open Home Foundation launch-screen badge and the Home
   Assistant Companion App Store smart-banner (HA-specific brand surfaces).
 

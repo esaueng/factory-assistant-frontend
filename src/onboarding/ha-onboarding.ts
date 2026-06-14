@@ -106,9 +106,6 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
 
   @state() private _page = extractSearchParam("page");
 
-  private _mobileApp =
-    extractSearchParam("redirect_uri") === "homeassistant://auth-callback";
-
   connectedCallback() {
     super.connectedCallback();
     mainWindow.addEventListener("location-changed", this._updatePage);
@@ -133,7 +130,6 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
       ${this._init && !this._restoring
         ? html`<onboarding-welcome-links
             .localize=${this.localize}
-            .mobileApp=${this._mobileApp}
           ></onboarding-welcome-links>`
         : nothing}
       <div class="footer">

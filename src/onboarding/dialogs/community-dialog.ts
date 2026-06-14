@@ -1,4 +1,4 @@
-import { mdiAccountGroup, mdiOpenInNew } from "@mdi/js";
+import { mdiAccountGroup, mdiFileDocument, mdiOpenInNew } from "@mdi/js";
 import { LitElement, css, html, nothing } from "lit";
 import { customElement } from "lit/decorators";
 import "../../components/ha-dialog";
@@ -24,13 +24,9 @@ class DialogCommunity extends DialogMixin<CommunityDialogParams>(LitElement) {
         <ha-list-item-button
           target="_blank"
           rel="noreferrer noopener"
-          href="https://community.home-assistant.io/"
+          href="https://github.com/esaueng/factoryassistant-os"
         >
-          <img
-            src="/static/icons/favicon-192x192.png"
-            slot="start"
-            alt="Factory Assistant Logo"
-          />
+          <ha-svg-icon .path=${mdiAccountGroup} slot="start"></ha-svg-icon>
           <span slot="headline">
             ${this.params.localize("ui.panel.page-onboarding.welcome.forums")}
           </span>
@@ -39,44 +35,12 @@ class DialogCommunity extends DialogMixin<CommunityDialogParams>(LitElement) {
         <ha-list-item-button
           target="_blank"
           rel="noreferrer noopener"
-          href="https://newsletter.openhomefoundation.org/"
+          href="https://github.com/esaueng/factoryassistant-os/tree/main/docs"
         >
-          <img
-            src="/static/icons/logo_ohf.svg"
-            slot="start"
-            alt="Open Home Foundation Logo"
-          />
+          <ha-svg-icon .path=${mdiFileDocument} slot="start"></ha-svg-icon>
           <span slot="headline">
             ${this.params.localize(
               "ui.panel.page-onboarding.welcome.open_home_newsletter"
-            )}
-          </span>
-          <ha-svg-icon slot="end" .path=${mdiOpenInNew}></ha-svg-icon>
-        </ha-list-item-button>
-        <ha-list-item-button
-          target="_blank"
-          rel="noreferrer noopener"
-          href="https://www.home-assistant.io/join-chat"
-        >
-          <img
-            src="/static/images/logo_discord.png"
-            slot="start"
-            alt="Discord Logo"
-          />
-          <span slot="headline">
-            ${this.params.localize("ui.panel.page-onboarding.welcome.discord")}
-          </span>
-          <ha-svg-icon slot="end" .path=${mdiOpenInNew}></ha-svg-icon>
-        </ha-list-item-button>
-        <ha-list-item-button
-          target="_blank"
-          rel="noreferrer noopener"
-          href="https://fosstodon.org/@homeassistant"
-        >
-          <ha-svg-icon .path=${mdiAccountGroup} slot="start"></ha-svg-icon>
-          <span slot="headline">
-            ${this.params.localize(
-              "ui.panel.page-onboarding.welcome.social_media"
             )}
           </span>
           <ha-svg-icon slot="end" .path=${mdiOpenInNew}></ha-svg-icon>
@@ -88,10 +52,6 @@ class DialogCommunity extends DialogMixin<CommunityDialogParams>(LitElement) {
   static styles = css`
     ha-dialog {
       --dialog-content-padding: 0;
-    }
-    img {
-      width: 32px;
-      height: 32px;
     }
     ha-svg-icon {
       color: var(--ha-color-text-secondary);

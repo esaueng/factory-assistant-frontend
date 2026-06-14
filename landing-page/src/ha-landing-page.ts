@@ -1,7 +1,6 @@
 import { mdiOpenInNew } from "@mdi/js";
 import { css, html, nothing, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators";
-import { extractSearchParam } from "../../src/common/url/search-params";
 import "../../src/components/animation/ha-fade-in";
 import "../../src/components/ha-alert";
 import "../../src/components/ha-button";
@@ -42,9 +41,6 @@ class HaLandingPage extends LandingPageBaseElement {
   @state() private _coreCheckActive = false;
 
   @state() private _progress = -1;
-
-  private _mobileApp =
-    extractSearchParam("redirect_uri") === "homeassistant://auth-callback";
 
   render() {
     const networkIssue = this._networkInfo && !this._networkInfo.host_internet;
@@ -102,7 +98,6 @@ class HaLandingPage extends LandingPageBaseElement {
       </ha-card>
       <onboarding-welcome-links
         .localize=${this.localize}
-        .mobileApp=${this._mobileApp}
       ></onboarding-welcome-links>
       <div class="footer">
         <ha-language-picker

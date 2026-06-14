@@ -1,0 +1,71 @@
+# Factory Assistant frontend
+
+The Factory Assistant fork of the Home Assistant frontend.
+**Factory Assistant is based on Home Assistant.**
+
+It carries a **minimal identity rebrand** of the user-visible product chrome;
+everything else tracks upstream so upstream releases keep merging cleanly.
+
+## What is rebranded (vs. upstream)
+
+- **Product name** in the browser/tab title, the PWA metas
+  (`application-name`, `apple-mobile-web-app-title`), the sidebar header, and
+  the About dialog → "Factory Assistant"
+  (`src/html/*.template`, `src/state/panel-title-mixin.ts`,
+  `src/components/ha-sidebar.ts`, `src/panels/config/info/ha-config-info.ts`).
+- **Logo + favicon / PWA icon set** → an **original** placeholder "gauge" mark
+  (amber `#F5A623` on graphite), **not derived from any Home Assistant or
+  `home-assistant/brands` asset** (`src/components/ha-logo-svg.ts`,
+  `src/resources/home-assistant-logo-svg.ts`, `public/static/icons/*`, the
+  index launch-screen SVG, `mask-icon.svg`). Final artwork: see the OS repo's
+  `branding/assets/README.md` spec.
+- **Onboarding / landing-page** "Preparing/installing" strings and the About
+  logo alt text (`src/translations/en.json`).
+- **Removed** the Open Home Foundation launch-screen badge and the Home
+  Assistant Companion App Store smart-banner (HA-specific brand surfaces).
+
+## What is intentionally NOT changed
+
+- **Internal identifiers stay upstream-compatible**: the `<home-assistant>` /
+  `<ha-*>` element tags, the package name (`home-assistant-frontend` /
+  `hass-frontend`), API/event/service names, and the `mdiHomeAssistant` export
+  symbol (path data swapped, **name kept**) — so the ecosystem and upstream
+  merges keep working.
+- **"Home Assistant Cloud"**, integration/domain names, and companion-app
+  documentation links — these name real upstream services, not this product.
+- **The default color palette** (`--ha-color-primary-*`) is upstream's. The
+  Factory Assistant **amber accent is delivered by the shipped
+  `factory-assistant` theme** in the OS image — not by replacing the frontend's
+  color globals. This keeps the merge minimal and avoids accessibility
+  regressions across the UI.
+
+## Build
+
+```sh
+nvm use            # Node 24 (.nvmrc)
+corepack enable
+yarn install
+yarn build         # = script/build_frontend  (gulp build-app)
+```
+
+Output: `hass_frontend/` — the content packaged as the `home-assistant-frontend`
+Python wheel that Core serves.
+
+## How it reaches the OS image
+
+Factory Assistant Core depends on the `home-assistant-frontend` wheel. To ship
+this rebranded UI on the appliance: build the wheel from this fork, publish it
+to the Factory Assistant package/container registry, and have the Factory
+Assistant **Core image** install it (the Supervisor/Core fork + registry track —
+see the OS repo `docs/ARCHITECTURE.md` and `docs/BRANDING.md` §4). Until that
+lands, the appliance ships upstream's frontend with the `factory-assistant`
+theme applied.
+
+## Known follow-ups (not in this first pass)
+
+- Replace the placeholder gauge mark with final original artwork.
+- Companion-app surfaces that still show HA App Store / Play Store QR codes
+  (`src/onboarding/dialogs/app-dialog.ts`, Matter add-device) — feature-coupled.
+- The `cast/` and `demo/` sub-apps (separate manifests).
+- A comprehensive translation pass beyond the product chrome.
+- Accessibility review if the amber accent is ever applied as the default.

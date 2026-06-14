@@ -19,8 +19,13 @@ everything else tracks upstream so upstream releases keep merging cleanly.
   `src/resources/home-assistant-logo-svg.ts`, `public/static/icons/*`, the
   index launch-screen SVG, `mask-icon.svg`). Final artwork: see the OS repo's
   `branding/assets/README.md` spec.
-- **Onboarding / landing-page** "Preparing/installing" strings and the About
-  logo alt text (`src/translations/en.json`).
+- **Onboarding / landing-page** "Preparing/installing" strings, the landing
+  page browser title, landing-page header image/alt text, landing-page source
+  links, and the About logo alt text (`src/translations/en.json`,
+  `landing-page/src/ha-landing-page.ts`,
+  `src/onboarding/onboarding-welcome-links.ts`,
+  `landing-page/src/html/index.html.template`,
+  `landing-page/public/static/icons/*`).
 - **Initial onboarding** now includes an industrial onboarding readiness panel
   covering site/line/cell setup, plant NTP and static-IP planning, Mosquitto
   availability, and the local-first default where cloud and analytics stay off

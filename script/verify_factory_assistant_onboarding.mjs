@@ -157,6 +157,45 @@ assert(
   /Local-first onboarding\s+welcome/.test(factoryNotes),
   "FACTORY_ASSISTANT.md does not document the local-first onboarding welcome cleanup"
 );
+assert(
+  pageOnboarding.help === "Factory Assistant onboarding guide",
+  "onboarding footer help label must be Factory Assistant-branded"
+);
+assert(
+  onboardingHostSource.includes(
+    "https://github.com/esaueng/factoryassistant-os"
+  ),
+  "onboarding footer help link must point to the esaueng-owned OS repository/docs"
+);
+assert(
+  !onboardingHostSource.includes(
+    "https://www.home-assistant.io/getting-started/onboarding/"
+  ),
+  "onboarding footer help link still points to upstream Home Assistant docs"
+);
+assert(
+  !onboardingHostSource.includes('import "./onboarding-analytics"') &&
+    !onboardingHostSource.includes("<onboarding-analytics"),
+  "onboarding host must not render the opt-in analytics screen during first setup"
+);
+
+const normalizedOnboardingHost = onboardingHostSource.replace(/\s+/g, " ");
+const analyticsPreferencesIndex = normalizedOnboardingHost.indexOf(
+  "await setAnalyticsPreferences(this.hass!, {})"
+);
+const analyticsOnboardingIndex = normalizedOnboardingHost.indexOf(
+  "await onboardAnalyticsStep(this.hass!)"
+);
+assert(
+  analyticsPreferencesIndex !== -1 &&
+    analyticsOnboardingIndex !== -1 &&
+    analyticsPreferencesIndex < analyticsOnboardingIndex,
+  "onboarding host must save empty analytics preferences before completing the analytics step"
+);
+assert(
+  /analytics onboarding step\s+skip/.test(factoryNotes),
+  "FACTORY_ASSISTANT.md does not document the analytics onboarding step skip"
+);
 
 assert(
   landingPageTemplate.includes("<title>Factory Assistant</title>"),

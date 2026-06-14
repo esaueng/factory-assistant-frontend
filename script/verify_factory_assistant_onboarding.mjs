@@ -307,6 +307,52 @@ assert(
   "FACTORY_ASSISTANT.md does not document the native industrial setup wizard step"
 );
 
+const restoreTranslations = pageOnboarding.restore;
+const genericRestoreStrings = [
+  [
+    "restore.details.home_assistant_missing",
+    restoreTranslations.details.home_assistant_missing,
+  ],
+  [
+    "restore.details.apps_unsupported",
+    restoreTranslations.details.apps_unsupported,
+  ],
+  [
+    "restore.restore_no_home_assistant",
+    restoreTranslations.restore_no_home_assistant,
+  ],
+  [
+    "restore.in_progress_description",
+    restoreTranslations.in_progress_description,
+  ],
+  [
+    "restore.confirm_restore_partial_backup_text",
+    restoreTranslations.confirm_restore_partial_backup_text,
+  ],
+  [
+    "restore.confirm_restore_full_backup_text",
+    restoreTranslations.confirm_restore_full_backup_text,
+  ],
+  [
+    "restore.options.upload_description",
+    restoreTranslations.options.upload_description,
+  ],
+  [
+    "custom.external_panel.complete_access",
+    translations.ui.panel.custom.external_panel.complete_access,
+  ],
+];
+for (const [label, value] of genericRestoreStrings) {
+  assert(
+    value.includes("Factory Assistant"),
+    `${label} must use Factory Assistant product wording`
+  );
+  assert(
+    !value.includes("Home Assistant"),
+    `${label} still uses upstream Home Assistant product wording`
+  );
+}
+
 assert(
   landingPageTemplate.includes("<title>Factory Assistant</title>"),
   "landing-page HTML title must be Factory Assistant"

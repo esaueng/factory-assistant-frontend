@@ -27,7 +27,10 @@ import "../components/ha-card";
 import { setAnalyticsPreferences } from "../data/analytics";
 import type { AuthUrlSearchParams } from "../data/auth";
 import { hassUrl } from "../data/auth";
-import { saveFrontendSystemData } from "../data/frontend";
+import {
+  type FactoryAssistantOnboardingSystemData,
+  saveFrontendSystemData,
+} from "../data/frontend";
 import type { OnboardingResponses, OnboardingStep } from "../data/onboarding";
 import {
   fetchInstallationType,
@@ -64,6 +67,7 @@ type OnboardingEvent =
     }
   | {
       type: "industrial_setup";
+      result: FactoryAssistantOnboardingSystemData;
     }
   | {
       type: "integration";
@@ -385,8 +389,20 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
   private async _handleStepDone(ev: HASSDomEvent<OnboardingEvent>) {
     const stepResult = ev.detail;
     if (stepResult.type === "industrial_setup") {
-      this._industrialSetupComplete = true;
-      this._progress = Math.max(this._progress, 85);
+      this._loading = true;
+      try {
+        await saveFrontendSystemData(
+          this.hass!.connection,
+          "factory_assistant_onboarding",
+          stepResult.result
+        );
+        this._industrialSetupComplete = true;
+        this._progress = Math.max(this._progress, 85);
+      } catch (err: any) {
+        alert(`Unable to save industrial setup: ${err.message}`);
+      } finally {
+        this._loading = false;
+      }
       return;
     }
 

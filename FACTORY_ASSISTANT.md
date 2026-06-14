@@ -31,6 +31,10 @@ everything else tracks upstream so upstream releases keep merging cleanly.
   availability, and the local-first default where cloud and analytics stay off
   unless a site owner enables them. This is the visible P3 bridge, not the full
   backend-driven industrial setup wizard.
+- **Industrial setup wizard** adds a native onboarding checkpoint between Core
+  config and integrations for site identity, line/cell/machine modeling,
+  NTP/static-IP posture, Mosquitto readiness, local-first defaults, and the
+  Plant overview/Andon/Wallboard dashboard handoff.
 - **Local-first onboarding welcome** removes the default Home Assistant Cloud
   restore option, removes the upstream companion-app download card, and points
   onboarding community/help links at esaueng-owned Factory Assistant source and

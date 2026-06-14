@@ -31,6 +31,7 @@ const communityDialogSource = readText(
 );
 const configInfoSource = readText("src/panels/config/info/ha-config-info.ts");
 const configInfoText = configInfoSource.replace(/\s+/g, " ");
+const frontendDataSource = readText("src/data/frontend.ts");
 const sidebarSource = readText("src/components/ha-sidebar.ts");
 const landingPageSource = readText("landing-page/src/ha-landing-page.ts");
 const landingPageTemplate = readText(
@@ -104,6 +105,17 @@ const industrialSetupKeys = [
   "dashboards",
   "continue",
 ];
+const industrialSetupDataKeys = [
+  "site_name",
+  "line_name",
+  "cell_name",
+  "ntp_source",
+  "static_ip_plan",
+  "mosquitto_broker",
+  "local_first_confirmed",
+  "dashboard_seed_confirmed",
+  "safety_acknowledged",
+];
 assert(
   industrialSetup,
   "Missing page-onboarding.industrial_setup translations"
@@ -112,6 +124,12 @@ for (const key of industrialSetupKeys) {
   assert(
     industrialSetup?.[key],
     `Missing page-onboarding.industrial_setup.${key} translation`
+  );
+}
+for (const key of industrialSetupDataKeys) {
+  assert(
+    industrialSetup?.data?.[key],
+    `Missing page-onboarding.industrial_setup.data.${key} translation`
   );
 }
 const industrialSetupText = Object.values(industrialSetup ?? {})
@@ -268,9 +286,23 @@ for (const key of industrialSetupKeys) {
     `onboarding-industrial-setup.ts does not render industrial_setup.${key}`
   );
 }
+for (const key of industrialSetupDataKeys) {
+  assert(
+    industrialSetupSource.includes(`name: "${key}"`),
+    `onboarding-industrial-setup.ts schema missing industrial_setup.data.${key}`
+  );
+}
+assert(
+  industrialSetupSource.includes("industrial_setup.data.") &&
+    industrialSetupSource.includes("schema.name"),
+  "onboarding-industrial-setup.ts must localize industrial setup form labels"
+);
 for (const snippet of [
   '@customElement("onboarding-industrial-setup")',
   'type: "industrial_setup"',
+  "FactoryAssistantOnboardingSystemData",
+  "INDUSTRIAL_SETUP_SCHEMA",
+  "<ha-form",
   'class="industrial-setup"',
   'class="setup-list"',
   "Factory Assistant is a monitoring tool, not a safety device.",
@@ -297,14 +329,27 @@ assert(
   onboardingHostSource.includes('import "./onboarding-industrial-setup"') &&
     onboardingHostSource.includes("<onboarding-industrial-setup") &&
     onboardingHostSource.includes('type: "industrial_setup"') &&
+    onboardingHostSource.includes("FactoryAssistantOnboardingSystemData") &&
+    onboardingHostSource.includes('"factory_assistant_onboarding"') &&
+    onboardingHostSource.includes("await saveFrontendSystemData") &&
     onboardingHostSource.includes("_industrialSetupComplete") &&
     onboardingHostSource.indexOf("<onboarding-industrial-setup") <
       onboardingHostSource.indexOf("<onboarding-integrations"),
   "onboarding host must render the industrial setup step before integrations"
 );
 assert(
+  frontendDataSource.includes("FactoryAssistantOnboardingSystemData") &&
+    frontendDataSource.includes("factory_assistant_onboarding") &&
+    frontendDataSource.includes("recorded_at"),
+  "frontend system data must define the Factory Assistant onboarding handoff payload"
+);
+assert(
   /Industrial setup\s+wizard/.test(factoryNotes),
   "FACTORY_ASSISTANT.md does not document the native industrial setup wizard step"
+);
+assert(
+  factoryNotes.includes("factory_assistant_onboarding"),
+  "FACTORY_ASSISTANT.md does not document the persisted industrial onboarding handoff key"
 );
 
 const restoreTranslations = pageOnboarding.restore;

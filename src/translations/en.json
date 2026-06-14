@@ -11012,6 +11012,17 @@
           "mosquitto_offer": "Install or offer the Mosquitto broker before MQTT gateways and OPC UA bridges.",
           "local_first": "Keep cloud and analytics off by default unless the site owner enables them.",
           "dashboards": "Seed Plant overview, Andon, and Wallboard dashboards for the site.",
+          "data": {
+            "site_name": "Site name",
+            "line_name": "First production line",
+            "cell_name": "First cell or station",
+            "ntp_source": "Plant NTP source",
+            "static_ip_plan": "Static IP plan or DHCP note",
+            "mosquitto_broker": "Offer the Mosquitto broker before MQTT gateways",
+            "local_first_confirmed": "Keep cloud and analytics off by default",
+            "dashboard_seed_confirmed": "Seed Plant overview, Andon, and Wallboard dashboards",
+            "safety_acknowledged": "I understand Factory Assistant is monitoring-only and not a safety device"
+          },
           "continue": "Continue to integrations"
         },
         "user": {

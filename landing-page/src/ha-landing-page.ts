@@ -115,7 +115,7 @@ class HaLandingPage extends LandingPageBaseElement {
         <ha-button
           appearance="plain"
           variant="neutral"
-          href="https://www.home-assistant.io/getting-started/onboarding/"
+          href="https://github.com/esaueng/factoryassistant-os/tree/main/docs"
           target="_blank"
           rel="noreferrer noopener"
         >

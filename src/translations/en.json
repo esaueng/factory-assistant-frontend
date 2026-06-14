@@ -10991,6 +10991,14 @@
           "playstore": "Get it on Google Play",
           "appstore": "Download on the App Store"
         },
+        "industrial_readiness": {
+          "aria_label": "Industrial onboarding readiness",
+          "title": "Commissioning checklist",
+          "site_line_cell": "Define the site, line, and cell structure before adding machines.",
+          "network_time": "Confirm plant NTP, static IP planning, and factory-assistant.local resolution.",
+          "mqtt_broker": "Install or offer Mosquitto before MQTT, OPC UA, or PLC gateway work.",
+          "local_first": "Cloud and analytics remain off unless a site owner enables them."
+        },
         "user": {
           "header": "Create user",
           "intro": "Let's get started by creating a user account.",

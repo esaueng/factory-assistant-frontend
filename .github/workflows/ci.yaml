@@ -5,10 +5,12 @@ on:
     branches:
       - dev
       - master
+      - rebrand-factory-assistant
   pull_request:
     branches:
       - dev
       - master
+      - rebrand-factory-assistant
 
 env:
   NODE_OPTIONS: --max_old_space_size=6144
@@ -35,6 +37,8 @@ jobs:
         with:
           node-version-file: ".nvmrc"
           cache: yarn
+      - name: Run Factory Assistant checks
+        run: node script/verify_factory_assistant_onboarding.mjs
       - name: Install dependencies
         run: yarn install --immutable
       - name: Check for duplicate dependencies

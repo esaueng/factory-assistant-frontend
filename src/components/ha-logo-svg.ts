@@ -10,9 +10,20 @@ export class HaLogoSvg extends LitElement {
     // Original artwork; NOT derived from any Home Assistant / home-assistant
     // brands asset. Source: branding/assets/fa-mark.svg.
     return html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
-      <g fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round">
-        <polygon stroke-width="18" points="120,28 199.7,74 199.7,166 120,212 40.3,166 40.3,74" />
-        <path stroke-width="16" d="M52 120 L96 120 L116 76 L136 164 L156 120 L196 120" />
+      <g
+        fill="none"
+        stroke="#F5A623"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polygon
+          stroke-width="18"
+          points="120,28 199.7,74 199.7,166 120,212 40.3,166 40.3,74"
+        />
+        <path
+          stroke-width="16"
+          d="M52 120 L96 120 L116 76 L136 164 L156 120 L196 120"
+        />
       </g>
     </svg>`;
   }

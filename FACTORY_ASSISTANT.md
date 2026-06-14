@@ -51,6 +51,10 @@ everything else tracks upstream so upstream releases keep merging cleanly.
   groups active alerts by critical/warning/info severity, shows acknowledge
   helper state as bookkeeping-only status, and opens alert details without
   service calls or safety-alarm claims.
+- **Native factory-wallboard-kiosk** is bundled as
+  `type: custom:factory-wallboard-kiosk`. It applies the wallboard contract by
+  hiding sidebar/header chrome, scaling dashboard type, and blocking dashboard
+  interactions for view-only displays.
 - **Removed** the Open Home Foundation launch-screen badge and the Home
   Assistant Companion App Store smart-banner (HA-specific brand surfaces).
 

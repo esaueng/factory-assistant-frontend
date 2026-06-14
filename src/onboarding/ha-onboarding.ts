@@ -44,6 +44,7 @@ import { storeState } from "../util/ha-pref-storage";
 import { registerServiceWorker } from "../util/register-service-worker";
 import "../components/progress/ha-progress-bar";
 import "./onboarding-create-user";
+import "./onboarding-industrial-setup";
 import "./onboarding-loading";
 import "./onboarding-welcome";
 import "./onboarding-welcome-links";
@@ -60,6 +61,9 @@ type OnboardingEvent =
   | {
       type: "core_config";
       result: OnboardingResponses["core_config"];
+    }
+  | {
+      type: "industrial_setup";
     }
   | {
       type: "integration";
@@ -108,6 +112,8 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
   @state() private _steps?: OnboardingStep[];
 
   @state() private _page = extractSearchParam("page");
+
+  @state() private _industrialSetupComplete = false;
 
   connectedCallback() {
     super.connectedCallback();
@@ -191,6 +197,13 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
       return html`<onboarding-loading></onboarding-loading>`;
     }
     if (step.step === "integration") {
+      if (!this._industrialSetupComplete) {
+        return html`
+          <onboarding-industrial-setup
+            .localize=${this.localize}
+          ></onboarding-industrial-setup>
+        `;
+      }
       return html`
         <onboarding-integrations
           .hass=${this.hass}
@@ -371,6 +384,12 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
 
   private async _handleStepDone(ev: HASSDomEvent<OnboardingEvent>) {
     const stepResult = ev.detail;
+    if (stepResult.type === "industrial_setup") {
+      this._industrialSetupComplete = true;
+      this._progress = Math.max(this._progress, 85);
+      return;
+    }
+
     this._steps = this._steps!.map((step) =>
       step.step === stepResult.type ? { ...step, done: true } : step
     );

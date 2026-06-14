@@ -24,6 +24,8 @@ const onboardingHostSource = readText("src/onboarding/ha-onboarding.ts");
 const welcomeLinksSource = readText(
   "src/onboarding/onboarding-welcome-links.ts"
 );
+const industrialSetupPath = "src/onboarding/onboarding-industrial-setup.ts";
+const industrialSetupSource = readOptionalText(industrialSetupPath);
 const communityDialogSource = readText(
   "src/onboarding/dialogs/community-dialog.ts"
 );
@@ -86,6 +88,52 @@ for (const phrase of [
   assert(
     readinessText.includes(phrase),
     `Missing industrial onboarding phrase: ${phrase}`
+  );
+}
+
+const industrialSetup = pageOnboarding.industrial_setup;
+const industrialSetupKeys = [
+  "title",
+  "intro",
+  "site_identity",
+  "line_cell_setup",
+  "network_posture",
+  "ntp_static_ip",
+  "mosquitto_offer",
+  "local_first",
+  "dashboards",
+  "continue",
+];
+assert(
+  industrialSetup,
+  "Missing page-onboarding.industrial_setup translations"
+);
+for (const key of industrialSetupKeys) {
+  assert(
+    industrialSetup?.[key],
+    `Missing page-onboarding.industrial_setup.${key} translation`
+  );
+}
+const industrialSetupText = Object.values(industrialSetup ?? {})
+  .join(" ")
+  .toLowerCase();
+for (const phrase of [
+  "site",
+  "line",
+  "cell",
+  "machine",
+  "ntp",
+  "static ip",
+  "mosquitto",
+  "cloud",
+  "analytics",
+  "plant overview",
+  "andon",
+  "wallboard",
+]) {
+  assert(
+    industrialSetupText.includes(phrase),
+    `Missing industrial setup phrase: ${phrase}`
   );
 }
 
@@ -208,6 +256,55 @@ assert(
 assert(
   /analytics onboarding step\s+skip/.test(factoryNotes),
   "FACTORY_ASSISTANT.md does not document the analytics onboarding step skip"
+);
+
+assert(
+  industrialSetupSource,
+  "Missing native onboarding-industrial-setup implementation"
+);
+for (const key of industrialSetupKeys) {
+  assert(
+    industrialSetupSource.includes(`industrial_setup.${key}`),
+    `onboarding-industrial-setup.ts does not render industrial_setup.${key}`
+  );
+}
+for (const snippet of [
+  '@customElement("onboarding-industrial-setup")',
+  'type: "industrial_setup"',
+  'class="industrial-setup"',
+  'class="setup-list"',
+  "Factory Assistant is a monitoring tool, not a safety device.",
+]) {
+  assert(
+    industrialSetupSource.includes(snippet),
+    `onboarding-industrial-setup.ts missing ${snippet}`
+  );
+}
+for (const forbidden of [
+  "callService",
+  "turn_on",
+  "turn_off",
+  "toggle",
+  "e-stop",
+  "interlock",
+]) {
+  assert(
+    !industrialSetupSource.includes(forbidden),
+    `onboarding-industrial-setup must not expose control/safety affordance: ${forbidden}`
+  );
+}
+assert(
+  onboardingHostSource.includes('import "./onboarding-industrial-setup"') &&
+    onboardingHostSource.includes("<onboarding-industrial-setup") &&
+    onboardingHostSource.includes('type: "industrial_setup"') &&
+    onboardingHostSource.includes("_industrialSetupComplete") &&
+    onboardingHostSource.indexOf("<onboarding-industrial-setup") <
+      onboardingHostSource.indexOf("<onboarding-integrations"),
+  "onboarding host must render the industrial setup step before integrations"
+);
+assert(
+  /Industrial setup\s+wizard/.test(factoryNotes),
+  "FACTORY_ASSISTANT.md does not document the native industrial setup wizard step"
 );
 
 assert(

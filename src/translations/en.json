@@ -11002,6 +11002,18 @@
           "mqtt_broker": "Install or offer Mosquitto before MQTT, OPC UA, or PLC gateway work.",
           "local_first": "Cloud and analytics remain off unless a site owner enables them."
         },
+        "industrial_setup": {
+          "title": "Set up your plant model",
+          "intro": "Review the Factory Assistant commissioning handoff before adding integrations.",
+          "site_identity": "Set the site name, time zone, and plant NTP source.",
+          "line_cell_setup": "Model each production line, cell, station, and machine before mapping telemetry.",
+          "network_posture": "Check the factory-assistant.local network path and monitoring VLAN placement.",
+          "ntp_static_ip": "Confirm NTP synchronization and static IP requirements for the appliance.",
+          "mosquitto_offer": "Install or offer the Mosquitto broker before MQTT gateways and OPC UA bridges.",
+          "local_first": "Keep cloud and analytics off by default unless the site owner enables them.",
+          "dashboards": "Seed Plant overview, Andon, and Wallboard dashboards for the site.",
+          "continue": "Continue to integrations"
+        },
         "user": {
           "header": "Create user",
           "intro": "Let's get started by creating a user account.",

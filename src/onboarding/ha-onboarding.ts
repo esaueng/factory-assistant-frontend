@@ -24,6 +24,7 @@ import {
 } from "../common/url/search-params";
 import { subscribeOne } from "../common/util/subscribe-one";
 import "../components/ha-card";
+import { setAnalyticsPreferences } from "../data/analytics";
 import type { AuthUrlSearchParams } from "../data/auth";
 import { hassUrl } from "../data/auth";
 import { saveFrontendSystemData } from "../data/frontend";
@@ -31,6 +32,7 @@ import type { OnboardingResponses, OnboardingStep } from "../data/onboarding";
 import {
   fetchInstallationType,
   fetchOnboardingOverview,
+  onboardAnalyticsStep,
   onboardIntegrationStep,
 } from "../data/onboarding";
 import { subscribeUser } from "../data/ws-user";
@@ -41,7 +43,6 @@ import type { HomeAssistant } from "../types";
 import { storeState } from "../util/ha-pref-storage";
 import { registerServiceWorker } from "../util/register-service-worker";
 import "../components/progress/ha-progress-bar";
-import "./onboarding-analytics";
 import "./onboarding-create-user";
 import "./onboarding-loading";
 import "./onboarding-welcome";
@@ -96,6 +97,8 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
 
   @state() private _loading = false;
 
+  @state() private _skippingAnalytics = false;
+
   @state() private _init = false;
 
   @state() private _restoring?: "upload" | "cloud";
@@ -140,7 +143,7 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
           @value-changed=${this._languageChanged}
         ></ha-language-picker>
         <a
-          href="https://www.home-assistant.io/getting-started/onboarding/"
+          href="https://github.com/esaueng/factoryassistant-os"
           target="_blank"
           rel="noreferrer noopener"
           >${this.localize("ui.panel.page-onboarding.help")}</a
@@ -185,12 +188,7 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
       `;
     }
     if (step.step === "analytics") {
-      return html`
-        <onboarding-analytics
-          .hass=${this.hass}
-          .localize=${this.localize}
-        ></onboarding-analytics>
-      `;
+      return html`<onboarding-loading></onboarding-loading>`;
     }
     if (step.step === "integration") {
       return html`
@@ -261,10 +259,42 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
         }
       }
     }
+    this._maybeSkipAnalyticsStep();
   }
 
   private _curStep() {
     return this._steps ? this._steps.find((stp) => !stp.done) : undefined;
+  }
+
+  private _maybeSkipAnalyticsStep() {
+    if (
+      this._skippingAnalytics ||
+      this._loading ||
+      !this.hass ||
+      this._curStep()?.step !== "analytics"
+    ) {
+      return;
+    }
+    void this._skipAnalyticsStep();
+  }
+
+  private async _skipAnalyticsStep() {
+    this._skippingAnalytics = true;
+    this._loading = true;
+    try {
+      await setAnalyticsPreferences(this.hass!, {});
+      await onboardAnalyticsStep(this.hass!);
+      this._steps = this._steps!.map((step) =>
+        step.step === "analytics" ? { ...step, done: true } : step
+      );
+      this._progress = 100;
+    } catch (err: any) {
+      alert(`Unable to finish analytics setup: ${err.message}`);
+      location.reload();
+    } finally {
+      this._loading = false;
+      this._skippingAnalytics = false;
+    }
   }
 
   private async _fetchInstallationType(): Promise<void> {

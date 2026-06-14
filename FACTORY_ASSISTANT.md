@@ -35,6 +35,10 @@ everything else tracks upstream so upstream releases keep merging cleanly.
   restore option, removes the upstream companion-app download card, and points
   onboarding community/help links at esaueng-owned Factory Assistant source and
   docs instead of upstream Home Assistant or OHF destinations.
+- **Local-first analytics onboarding step skip** saves empty analytics
+  preferences and completes the backend onboarding step without showing the
+  first-run opt-in screen. Site owners can still enable analytics later from
+  Settings.
 - **About panel contract** adds the required Factory Assistant attribution,
   non-affiliation notice, monitoring-only safety disclaimer, and links to the
   Factory Assistant safety boundary and open source license guidance instead of

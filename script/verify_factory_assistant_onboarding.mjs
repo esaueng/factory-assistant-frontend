@@ -40,6 +40,8 @@ const cardElementSource = readText(
 );
 const machineCardPath = "src/panels/lovelace/cards/fa-machine-card.ts";
 const machineCardSource = readOptionalText(machineCardPath);
+const andonViewPath = "src/panels/lovelace/cards/fa-andon-view.ts";
+const andonViewSource = readOptionalText(andonViewPath);
 
 const readBytes = (path) => readFileSync(join(root, path));
 const sha256 = (path) =>
@@ -359,6 +361,56 @@ assert(
 assert(
   /Native\s+fa-machine-card/.test(factoryNotes),
   "FACTORY_ASSISTANT.md does not document the native fa-machine-card"
+);
+
+assert(andonViewSource, "Missing native fa-andon-view implementation");
+assert(
+  andonViewSource.includes('@customElement("fa-andon-view")'),
+  "fa-andon-view must register the contract custom element"
+);
+assert(
+  andonViewSource.includes("critical") &&
+    andonViewSource.includes("warning") &&
+    andonViewSource.includes("info"),
+  "fa-andon-view must render critical, warning, and info severities"
+);
+assert(
+  andonViewSource.includes("acknowledge_is_bookkeeping") &&
+    andonViewSource.includes("safety_alarm_claim_allowed"),
+  "fa-andon-view must encode the andon contract safety flags"
+);
+assert(
+  andonViewSource.includes(
+    "Factory Assistant is a monitoring tool, not a safety device."
+  ) && andonViewSource.includes("Acknowledge is bookkeeping only"),
+  "fa-andon-view must render the monitoring-only and acknowledge disclaimer"
+);
+assert(
+  andonViewSource.includes("hass-more-info"),
+  "fa-andon-view alert rows must open detail-only more-info"
+);
+for (const forbidden of [
+  "callService",
+  "handleAction",
+  "actionHandler",
+  "turn_on",
+  "turn_off",
+  "toggle",
+  "e-stop",
+  "interlock",
+]) {
+  assert(
+    !andonViewSource.includes(forbidden),
+    `fa-andon-view must not expose control/safety affordance: ${forbidden}`
+  );
+}
+assert(
+  cardElementSource.includes('import "../cards/fa-andon-view";'),
+  "create-card-element must import fa-andon-view so custom:fa-andon-view is bundled"
+);
+assert(
+  /Native\s+fa-andon-view/.test(factoryNotes),
+  "FACTORY_ASSISTANT.md does not document the native fa-andon-view"
 );
 
 for (const secretName of [

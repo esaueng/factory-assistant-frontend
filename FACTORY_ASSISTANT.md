@@ -47,6 +47,10 @@ everything else tracks upstream so upstream releases keep merging cleanly.
   `type: custom:fa-machine-card`. It renders machine status, OEE, current job,
   maintenance state, freshness thresholds, and a detail-only more-info tap path
   with no control actions.
+- **Native fa-andon-view** is bundled as `type: custom:fa-andon-view`. It
+  groups active alerts by critical/warning/info severity, shows acknowledge
+  helper state as bookkeeping-only status, and opens alert details without
+  service calls or safety-alarm claims.
 - **Removed** the Open Home Foundation launch-screen badge and the Home
   Assistant Companion App Store smart-banner (HA-specific brand surfaces).
 

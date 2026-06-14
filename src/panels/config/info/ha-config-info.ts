@@ -103,8 +103,6 @@ class HaConfigInfo extends LitElement {
     const customUiList: { name: string; url: string; version: string }[] =
       (window as any).CUSTOM_UI_LIST || [];
 
-    const isDark = this.hass.themes?.darkMode || false;
-
     return html`
       <hass-subpage
         .hass=${this.hass}
@@ -183,18 +181,6 @@ class HaConfigInfo extends LitElement {
                   `
                 : nothing}
             </ul>
-          </ha-card>
-          <ha-card outlined class="ohf ${isDark ? "dark" : ""}">
-            <div>
-              ${this.hass.localize("ui.panel.config.info.proud_part_of")}
-            </div>
-            <a
-              href="https://www.openhomefoundation.org"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <img src="/static/icons/ohf.svg" alt="Open Home Foundation" />
-            </a>
           </ha-card>
 
           <ha-card outlined class="pages">
@@ -331,20 +317,6 @@ class HaConfigInfo extends LitElement {
           line-height: var(--ha-line-height-condensed);
           text-align: center;
           margin: 24px;
-        }
-
-        .ohf {
-          text-align: center;
-          padding-bottom: 5px;
-        }
-
-        .ohf img {
-          width: 100%;
-          max-width: 250px;
-        }
-
-        .ohf.dark img {
-          color-scheme: dark;
         }
 
         .versions {

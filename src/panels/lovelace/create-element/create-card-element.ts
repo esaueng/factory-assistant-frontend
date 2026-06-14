@@ -12,6 +12,7 @@ import "../cards/hui-weather-forecast-card";
 import "../cards/hui-tile-card";
 import "../cards/hui-heading-card";
 import "../cards/fa-machine-card";
+import "../cards/fa-andon-view";
 import {
   createLovelaceElement,
   getLovelaceElementClass,

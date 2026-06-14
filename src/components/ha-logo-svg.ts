@@ -5,15 +5,15 @@ import { customElement } from "lit/decorators";
 @customElement("ha-logo-svg")
 export class HaLogoSvg extends LitElement {
   protected render(): TemplateResult {
-    // Factory Assistant placeholder mark — original industrial "gauge" motif
-    // (amber #F5A623). NOT derived from any Home Assistant / home-assistant
-    // brands asset. Replace with final artwork per branding/assets spec.
+    // Factory Assistant mark — original "hex pulse" motif: a hexagon
+    // (industrial / modular) carrying a monitoring pulse, in amber #F5A623.
+    // Original artwork; NOT derived from any Home Assistant / home-assistant
+    // brands asset. Source: branding/assets/fa-mark.svg.
     return html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
-      <g fill="none" stroke="#F5A623" stroke-linecap="round">
-        <path stroke-width="22" d="M70 188 A85 85 0 1 1 170 188" />
-        <path stroke-width="20" d="M120 119 L168 86" />
+      <g fill="none" stroke="#F5A623" stroke-linecap="round" stroke-linejoin="round">
+        <polygon stroke-width="18" points="120,28 199.7,74 199.7,166 120,212 40.3,166 40.3,74" />
+        <path stroke-width="16" d="M52 120 L96 120 L116 76 L136 164 L156 120 L196 120" />
       </g>
-      <circle cx="120" cy="119" r="13" fill="#F5A623" />
     </svg>`;
   }
 

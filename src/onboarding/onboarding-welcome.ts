@@ -84,15 +84,6 @@ class OnboardingWelcome extends LitElement {
           </div>
           <ha-icon-next slot="end"></ha-icon-next>
         </ha-list-item-button>
-        <ha-list-item-button @click=${this._restoreBackupCloud}>
-          <div slot="headline">Home Assistant Cloud</div>
-          <div slot="supporting-text">
-            ${this.localize(
-              "ui.panel.page-onboarding.restore.ha-cloud.description"
-            )}
-          </div>
-          <ha-icon-next slot="end"></ha-icon-next>
-        </ha-list-item-button>
       </ha-list-base>
     `;
   }
@@ -107,13 +98,6 @@ class OnboardingWelcome extends LitElement {
     fireEvent(this, "onboarding-step", {
       type: "init",
       result: { restore: "upload" },
-    });
-  }
-
-  private _restoreBackupCloud(): void {
-    fireEvent(this, "onboarding-step", {
-      type: "init",
-      result: { restore: "cloud" },
     });
   }
 

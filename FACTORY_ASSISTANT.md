@@ -31,6 +31,10 @@ everything else tracks upstream so upstream releases keep merging cleanly.
   availability, and the local-first default where cloud and analytics stay off
   unless a site owner enables them. This is the visible P3 bridge, not the full
   backend-driven industrial setup wizard.
+- **Local-first onboarding welcome** removes the default Home Assistant Cloud
+  restore option, removes the upstream companion-app download card, and points
+  onboarding community/help links at esaueng-owned Factory Assistant source and
+  docs instead of upstream Home Assistant or OHF destinations.
 - **Removed** the Open Home Foundation launch-screen badge and the Home
   Assistant Companion App Store smart-banner (HA-specific brand surfaces).
 
@@ -74,7 +78,8 @@ theme applied.
 ## Known follow-ups (not in this first pass)
 
 - Replace the placeholder gauge mark with final original artwork.
-- Companion-app surfaces that still show HA App Store / Play Store QR codes
+- Companion-app surfaces that are not linked from the Factory Assistant
+  welcome path but still exist for upstream feature compatibility
   (`src/onboarding/dialogs/app-dialog.ts`, Matter add-device) — feature-coupled.
 - The `cast/` and `demo/` sub-apps (separate manifests).
 - A comprehensive translation pass beyond the product chrome.

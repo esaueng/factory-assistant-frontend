@@ -18,8 +18,12 @@ const translations = JSON.parse(readText("src/translations/en.json"));
 const pageOnboarding = translations.ui.panel["page-onboarding"];
 const readiness = pageOnboarding.industrial_readiness;
 const welcomeSource = readText("src/onboarding/onboarding-welcome.ts");
+const onboardingHostSource = readText("src/onboarding/ha-onboarding.ts");
 const welcomeLinksSource = readText(
   "src/onboarding/onboarding-welcome-links.ts"
+);
+const communityDialogSource = readText(
+  "src/onboarding/dialogs/community-dialog.ts"
 );
 const landingPageSource = readText("landing-page/src/ha-landing-page.ts");
 const landingPageTemplate = readText(
@@ -91,6 +95,65 @@ for (const snippet of [
 assert(
   factoryNotes.includes("industrial onboarding readiness panel"),
   "FACTORY_ASSISTANT.md does not document the industrial onboarding readiness panel"
+);
+assert(
+  welcomeSource.includes("restore.upload_backup"),
+  "onboarding welcome must keep local backup upload restore available"
+);
+assert(
+  !welcomeSource.includes("Home Assistant Cloud"),
+  "onboarding welcome still renders the Home Assistant Cloud restore option"
+);
+assert(
+  !welcomeSource.includes("_restoreBackupCloud"),
+  "onboarding welcome still wires cloud backup restore"
+);
+assert(
+  !welcomeSource.includes('restore: "cloud"'),
+  "onboarding welcome still starts cloud restore"
+);
+assert(
+  !welcomeLinksSource.includes("showAppDialog"),
+  "landing/onboarding welcome links still expose the upstream companion app dialog"
+);
+assert(
+  !welcomeLinksSource.includes("download_app"),
+  "landing/onboarding welcome links still render the upstream companion app card"
+);
+assert(
+  !onboardingHostSource.includes("homeassistant://auth-callback") &&
+    !onboardingHostSource.includes(".mobileApp="),
+  "onboarding host still wires upstream companion app redirect state into welcome links"
+);
+assert(
+  !communityDialogSource.includes("home-assistant.io") &&
+    !communityDialogSource.includes("community.home-assistant.io") &&
+    !communityDialogSource.includes("@homeassistant") &&
+    !communityDialogSource.includes("newsletter.openhomefoundation.org"),
+  "community dialog still points at upstream Home Assistant/OHF destinations"
+);
+assert(
+  !communityDialogSource.includes("logo_ohf.svg") &&
+    !communityDialogSource.includes("Open Home Foundation Logo"),
+  "community dialog still renders an OHF logo"
+);
+assert(
+  communityDialogSource.includes(
+    "https://github.com/esaueng/factoryassistant-os"
+  ),
+  "community dialog must point to the esaueng-owned OS repository/docs"
+);
+assert(
+  pageOnboarding.welcome.forums === "Factory Assistant source",
+  "onboarding community dialog source label must be Factory Assistant-branded"
+);
+assert(
+  pageOnboarding.welcome.open_home_newsletter === "Factory Assistant OS docs",
+  "onboarding community dialog docs label must be Factory Assistant-branded"
+);
+assert(
+  /Local-first onboarding\s+welcome/.test(factoryNotes),
+  "FACTORY_ASSISTANT.md does not document the local-first onboarding welcome cleanup"
 );
 
 assert(

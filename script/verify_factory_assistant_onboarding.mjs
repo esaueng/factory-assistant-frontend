@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { exit, stderr, stdout } from "node:process";
@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const readText = (path) => readFileSync(join(root, path), "utf8");
+const readOptionalText = (path) =>
+  existsSync(join(root, path)) ? readText(path) : "";
 
 const errors = [];
 const assert = (condition, message) => {
@@ -33,6 +35,11 @@ const landingPageTemplate = readText(
 );
 const relativeCiWorkflow = readText(".github/workflows/relative-ci.yaml");
 const factoryNotes = readText("FACTORY_ASSISTANT.md");
+const cardElementSource = readText(
+  "src/panels/lovelace/create-element/create-card-element.ts"
+);
+const machineCardPath = "src/panels/lovelace/cards/fa-machine-card.ts";
+const machineCardSource = readOptionalText(machineCardPath);
 
 const readBytes = (path) => readFileSync(join(root, path));
 const sha256 = (path) =>
@@ -303,6 +310,55 @@ assert(
 assert(
   /About panel\s+contract/.test(factoryNotes),
   "FACTORY_ASSISTANT.md does not document the About panel contract cleanup"
+);
+
+assert(machineCardSource, "Missing native fa-machine-card implementation");
+assert(
+  machineCardSource.includes('@customElement("fa-machine-card")'),
+  "fa-machine-card must register the contract custom element"
+);
+assert(
+  machineCardSource.includes("status_entity") &&
+    machineCardSource.includes("oee_entity") &&
+    machineCardSource.includes("job_entity") &&
+    machineCardSource.includes("maintenance_entity"),
+  "fa-machine-card must render status, OEE, job, and maintenance entities"
+);
+assert(
+  machineCardSource.includes("stale_after_intervals") &&
+    machineCardSource.includes("offline_after_intervals"),
+  "fa-machine-card must implement the frontend contract freshness intervals"
+);
+assert(
+  machineCardSource.includes(
+    "Factory Assistant is a monitoring tool, not a safety device."
+  ),
+  "fa-machine-card must render the monitoring-only safety disclaimer"
+);
+assert(
+  machineCardSource.includes("hass-more-info"),
+  "fa-machine-card tap behavior must be detail-only"
+);
+for (const forbidden of [
+  "callService",
+  "handleAction",
+  "actionHandler",
+  "turn_on",
+  "turn_off",
+  "toggle",
+]) {
+  assert(
+    !machineCardSource.includes(forbidden),
+    `fa-machine-card must not expose control/action affordance: ${forbidden}`
+  );
+}
+assert(
+  cardElementSource.includes('import "../cards/fa-machine-card";'),
+  "create-card-element must import fa-machine-card so custom:fa-machine-card is bundled"
+);
+assert(
+  /Native\s+fa-machine-card/.test(factoryNotes),
+  "FACTORY_ASSISTANT.md does not document the native fa-machine-card"
 );
 
 for (const secretName of [

@@ -11,6 +11,7 @@ import "../cards/hui-thermostat-card";
 import "../cards/hui-weather-forecast-card";
 import "../cards/hui-tile-card";
 import "../cards/hui-heading-card";
+import "../cards/fa-machine-card";
 import {
   createLovelaceElement,
   getLovelaceElementClass,

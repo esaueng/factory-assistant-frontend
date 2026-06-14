@@ -43,6 +43,10 @@ everything else tracks upstream so upstream releases keep merging cleanly.
   non-affiliation notice, monitoring-only safety disclaimer, and links to the
   Factory Assistant safety boundary and open source license guidance instead of
   upstream Home Assistant project destinations.
+- **Native fa-machine-card** is bundled for Factory Assistant dashboards as
+  `type: custom:fa-machine-card`. It renders machine status, OEE, current job,
+  maintenance state, freshness thresholds, and a detail-only more-info tap path
+  with no control actions.
 - **Removed** the Open Home Foundation launch-screen badge and the Home
   Assistant Companion App Store smart-banner (HA-specific brand surfaces).
 

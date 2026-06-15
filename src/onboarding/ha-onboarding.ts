@@ -27,15 +27,17 @@ import "../components/ha-card";
 import { setAnalyticsPreferences } from "../data/analytics";
 import type { AuthUrlSearchParams } from "../data/auth";
 import { hassUrl } from "../data/auth";
-import {
-  type FactoryAssistantOnboardingSystemData,
-  saveFrontendSystemData,
-} from "../data/frontend";
-import type { OnboardingResponses, OnboardingStep } from "../data/onboarding";
+import { saveFrontendSystemData } from "../data/frontend";
+import type {
+  FactoryAssistantIndustrialSetupPayload,
+  OnboardingResponses,
+  OnboardingStep,
+} from "../data/onboarding";
 import {
   fetchInstallationType,
   fetchOnboardingOverview,
   onboardAnalyticsStep,
+  onboardFactoryAssistantIndustrialStep,
   onboardIntegrationStep,
 } from "../data/onboarding";
 import { subscribeUser } from "../data/ws-user";
@@ -67,7 +69,7 @@ type OnboardingEvent =
     }
   | {
       type: "industrial_setup";
-      result: FactoryAssistantOnboardingSystemData;
+      result: FactoryAssistantIndustrialSetupPayload;
     }
   | {
       type: "integration";
@@ -199,6 +201,13 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
     }
     if (step.step === "analytics") {
       return html`<onboarding-loading></onboarding-loading>`;
+    }
+    if (step.step === "factory_assistant_industrial") {
+      return html`
+        <onboarding-industrial-setup
+          .localize=${this.localize}
+        ></onboarding-industrial-setup>
+      `;
     }
     if (step.step === "integration") {
       if (!this._industrialSetupComplete) {
@@ -341,6 +350,9 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
       }
 
       const steps: OnboardingStep[] = await response.json();
+      this._industrialSetupComplete =
+        steps.find((step) => step.step === "factory_assistant_industrial")
+          ?.done ?? false;
 
       if (steps.every((step) => step.done)) {
         // Onboarding is done!
@@ -391,10 +403,14 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
     if (stepResult.type === "industrial_setup") {
       this._loading = true;
       try {
-        await saveFrontendSystemData(
-          this.hass!.connection,
-          "factory_assistant_onboarding",
+        await onboardFactoryAssistantIndustrialStep(
+          this.hass!,
           stepResult.result
+        );
+        this._steps = this._steps!.map((step) =>
+          step.step === "factory_assistant_industrial"
+            ? { ...step, done: true }
+            : step
         );
         this._industrialSetupComplete = true;
         this._progress = Math.max(this._progress, 85);

@@ -1,6 +1,7 @@
 import type { HomeAssistant } from "../types";
 import { handleFetchPromise } from "../util/hass-call-api";
 import type { CloudStatus } from "./cloud";
+import type { FactoryAssistantOnboardingSystemData } from "./frontend";
 
 export interface InstallationType {
   installation_type:
@@ -23,9 +24,19 @@ export interface OnboardingIntegrationStepResponse {
 
 export interface OnboardingAnalyticsStepResponse {}
 
+export type FactoryAssistantIndustrialSetupPayload = Omit<
+  FactoryAssistantOnboardingSystemData,
+  "recorded_at"
+>;
+
+export interface OnboardingFactoryAssistantIndustrialStepResponse {
+  data: FactoryAssistantOnboardingSystemData;
+}
+
 export interface OnboardingResponses {
   user: OnboardingUserStepResponse;
   core_config: OnboardingCoreConfigStepResponse;
+  factory_assistant_industrial: OnboardingFactoryAssistantIndustrialStepResponse;
   integration: OnboardingIntegrationStepResponse;
   analytics: OnboardingAnalyticsStepResponse;
 }
@@ -75,6 +86,16 @@ export const onboardCoreConfigStep = (hass: HomeAssistant) =>
 
 export const onboardAnalyticsStep = (hass: HomeAssistant) =>
   hass.callApi<OnboardingAnalyticsStepResponse>("POST", "onboarding/analytics");
+
+export const onboardFactoryAssistantIndustrialStep = (
+  hass: HomeAssistant,
+  params: FactoryAssistantIndustrialSetupPayload
+) =>
+  hass.callApi<OnboardingFactoryAssistantIndustrialStepResponse>(
+    "POST",
+    "onboarding/factory_assistant_industrial",
+    params
+  );
 
 export const onboardIntegrationStep = (
   hass: HomeAssistant,

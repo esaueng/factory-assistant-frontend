@@ -197,10 +197,7 @@ class OnboardingIndustrialSetup extends LitElement {
     }
     fireEvent(this, "onboarding-step", {
       type: "industrial_setup",
-      result: {
-        ...this._handoff,
-        recorded_at: new Date().toISOString(),
-      },
+      result: this._handoff,
     });
   }
 

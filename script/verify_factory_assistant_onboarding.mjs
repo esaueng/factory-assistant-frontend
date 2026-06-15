@@ -32,6 +32,7 @@ const communityDialogSource = readText(
 const configInfoSource = readText("src/panels/config/info/ha-config-info.ts");
 const configInfoText = configInfoSource.replace(/\s+/g, " ");
 const frontendDataSource = readText("src/data/frontend.ts");
+const onboardingDataSource = readText("src/data/onboarding.ts");
 const sidebarSource = readText("src/components/ha-sidebar.ts");
 const landingPageSource = readText("landing-page/src/ha-landing-page.ts");
 const landingPageTemplate = readText(
@@ -328,14 +329,26 @@ for (const forbidden of [
 assert(
   onboardingHostSource.includes('import "./onboarding-industrial-setup"') &&
     onboardingHostSource.includes("<onboarding-industrial-setup") &&
+    onboardingHostSource.includes(
+      'step.step === "factory_assistant_industrial"'
+    ) &&
     onboardingHostSource.includes('type: "industrial_setup"') &&
-    onboardingHostSource.includes("FactoryAssistantOnboardingSystemData") &&
-    onboardingHostSource.includes('"factory_assistant_onboarding"') &&
-    onboardingHostSource.includes("await saveFrontendSystemData") &&
+    onboardingHostSource.includes("FactoryAssistantIndustrialSetupPayload") &&
+    onboardingHostSource.includes("onboardFactoryAssistantIndustrialStep") &&
     onboardingHostSource.includes("_industrialSetupComplete") &&
     onboardingHostSource.indexOf("<onboarding-industrial-setup") <
       onboardingHostSource.indexOf("<onboarding-integrations"),
-  "onboarding host must render the industrial setup step before integrations"
+  "onboarding host must render and complete the backend industrial setup step"
+);
+assert(
+  onboardingDataSource.includes("onboardFactoryAssistantIndustrialStep") &&
+    onboardingDataSource.includes("onboarding/factory_assistant_industrial") &&
+    onboardingDataSource.includes("FactoryAssistantOnboardingSystemData"),
+  "onboarding data API must expose the Factory Assistant industrial setup endpoint"
+);
+assert(
+  !industrialSetupSource.includes("new Date().toISOString()"),
+  "industrial setup form must let Core stamp recorded_at"
 );
 assert(
   frontendDataSource.includes("FactoryAssistantOnboardingSystemData") &&

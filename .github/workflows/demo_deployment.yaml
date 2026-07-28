@@ -17,7 +17,7 @@ env:
 
 jobs:
   deploy_dev:
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     name: Demo Development
     if: github.event_name != 'push' || github.ref_name != 'master'
     environment:
@@ -53,7 +53,7 @@ jobs:
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_DEMO_DEV_SITE_ID }}
 
   deploy_master:
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     name: Demo Production
     if: github.event_name == 'push' && github.ref_name == 'master'
     environment:

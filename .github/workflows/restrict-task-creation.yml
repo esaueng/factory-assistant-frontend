@@ -13,7 +13,7 @@ concurrency:
 jobs:
   add-no-stale:
     name: Add no-stale label
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     permissions:
       issues: write # To add labels to issues
     if: >-
@@ -34,7 +34,7 @@ jobs:
 
   check-authorization:
     name: Check authorization
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     permissions:
       issues: write # To comment on, label, and close issues
     # Only run if this is a Task issue type (from the issue form)

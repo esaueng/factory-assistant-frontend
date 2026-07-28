@@ -15,7 +15,7 @@ jobs:
   upload-frontend-modern:
     name: Upload stats (frontend/modern)
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     env:
       RELATIVE_CI_KEY_frontend_modern: ${{ secrets.RELATIVE_CI_KEY_frontend_modern }}
       RELATIVE_CI_KEY: ${{ secrets.RELATIVE_CI_KEY_frontend_modern }}
@@ -36,7 +36,7 @@ jobs:
   upload-frontend-legacy:
     name: Upload stats (frontend/legacy)
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     env:
       RELATIVE_CI_KEY_frontend_legacy: ${{ secrets.RELATIVE_CI_KEY_frontend_legacy }}
       RELATIVE_CI_KEY: ${{ secrets.RELATIVE_CI_KEY_frontend_legacy }}

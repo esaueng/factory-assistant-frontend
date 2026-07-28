@@ -18,7 +18,7 @@ permissions:
 jobs:
   release:
     name: Release
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     environment: pypi
     permissions:
       contents: write # Required to upload release assets
@@ -71,7 +71,7 @@ jobs:
   wheels-init:
     name: Init wheels build
     needs: release
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     steps:
       - name: Generate requirements.txt
         env:
@@ -108,7 +108,7 @@ jobs:
   release-landing-page:
     name: Release landing-page frontend
     if: github.event.release.prerelease == false
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     permissions:
       contents: write # Required to upload release assets
     steps:

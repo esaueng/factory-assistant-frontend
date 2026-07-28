@@ -15,7 +15,7 @@ permissions:
 jobs:
   nightly:
     name: Nightly
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     permissions:
       contents: write
     steps:

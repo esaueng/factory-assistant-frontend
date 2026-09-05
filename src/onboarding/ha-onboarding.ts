@@ -121,6 +121,8 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
 
   @state() private _industrialSetupComplete = false;
 
+  @state() private _industrialSetupSupported = false;
+
   connectedCallback() {
     super.connectedCallback();
     mainWindow.addEventListener("location-changed", this._updatePage);
@@ -210,7 +212,7 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
       `;
     }
     if (step.step === "integration") {
-      if (!this._industrialSetupComplete) {
+      if (this._industrialSetupSupported && !this._industrialSetupComplete) {
         return html`
           <onboarding-industrial-setup
             .localize=${this.localize}
@@ -350,9 +352,11 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
       }
 
       const steps: OnboardingStep[] = await response.json();
-      this._industrialSetupComplete =
-        steps.find((step) => step.step === "factory_assistant_industrial")
-          ?.done ?? false;
+      const industrialStep = steps.find(
+        (step) => step.step === "factory_assistant_industrial"
+      );
+      this._industrialSetupSupported = industrialStep !== undefined;
+      this._industrialSetupComplete = industrialStep?.done ?? false;
 
       if (steps.every((step) => step.done)) {
         // Onboarding is done!
@@ -401,6 +405,9 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
   private async _handleStepDone(ev: HASSDomEvent<OnboardingEvent>) {
     const stepResult = ev.detail;
     if (stepResult.type === "industrial_setup") {
+      if (!this._industrialSetupSupported || this._industrialSetupComplete) {
+        return;
+      }
       this._loading = true;
       try {
         await onboardFactoryAssistantIndustrialStep(

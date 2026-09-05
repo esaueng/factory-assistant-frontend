@@ -37,6 +37,12 @@ everything else tracks upstream so upstream releases keep merging cleanly.
   Plant overview/Andon/Wallboard dashboard handoff. The step records a
   monitoring-only handoff payload in frontend system data under
   `factory_assistant_onboarding` before integrations run.
+  The wizard requires the backend to advertise the
+  `factory_assistant_industrial` onboarding step. Upstream Core backends that
+  omit this capability continue directly to integrations without collecting
+  industrial setup data or calling the fork-only endpoint. Supporting backends
+  still require successful persistence before integrations are shown, including
+  after reloading onboarding.
 - **Local-first onboarding welcome** removes the default Home Assistant Cloud
   restore option, removes the upstream companion-app download card, and points
   onboarding community/help links at esaueng-owned Factory Assistant source and

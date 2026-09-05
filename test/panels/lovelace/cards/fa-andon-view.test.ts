@@ -54,6 +54,59 @@ describe("fa-andon-view", () => {
     document.body.innerHTML = "";
   });
 
+  it.each(
+    (["critical", "warning", "info"] as const).flatMap((severity) =>
+      ["unavailable", "unknown"].flatMap((state) =>
+        [false, true].map((showCleared) => ({ severity, state, showCleared }))
+      )
+    )
+  )(
+    "keeps $severity alerts visible through $state with show_cleared=$showCleared",
+    async ({ severity, state, showCleared }) => {
+      const entityId = "binary_sensor.line1_press03_overtemp_alert";
+      const element = document.createElement("fa-andon-view");
+      element.setConfig({
+        type: "custom:fa-andon-view",
+        show_cleared: showCleared,
+        alerts: [{ entity: entityId, name: "Machine alert", severity }],
+      });
+      element.hass = makeHass();
+      document.body.appendChild(element);
+      await element.updateComplete;
+
+      const section = () =>
+        element.shadowRoot!.querySelector(`section.${severity}`)!;
+      expect(section().querySelector(".alert-row.active")).not.toBeNull();
+
+      for (const nextState of [state, "on", state, "off", "clear"]) {
+        element.hass = {
+          ...element.hass!,
+          states: {
+            ...element.hass!.states,
+            [entityId]: makeState(entityId, nextState, "2026-06-14T12:05:00Z"),
+          },
+        };
+        // eslint-disable-next-line no-await-in-loop -- Verify each rendered transition.
+        await element.updateComplete;
+
+        const row = section().querySelector(".alert-row");
+        if (nextState === state) {
+          expect(row?.textContent).toContain("Signal unavailable");
+          expect(row?.classList.contains("missing")).toBe(true);
+          expect(section().querySelector(".empty")).toBeNull();
+        } else if (nextState === "on") {
+          expect(row?.classList.contains("active")).toBe(true);
+        } else if (showCleared) {
+          expect(row?.textContent).toContain("Clear");
+          expect(row?.classList.contains("clear")).toBe(true);
+        } else {
+          expect(row).toBeNull();
+          expect(section().textContent).toContain(`No ${severity} alerts`);
+        }
+      }
+    }
+  );
+
   it("groups active alerts by severity and renders the bookkeeping disclaimer", async () => {
     const element = document.createElement("fa-andon-view");
     element.setConfig({

@@ -244,12 +244,10 @@ class FactoryAssistantAndonView extends LitElement implements LovelaceCard {
       return "missing";
     }
     const stateValue = stateObj.state.toLowerCase();
-    if (
-      stateValue === "off" ||
-      stateValue === "clear" ||
-      stateValue === "unavailable" ||
-      stateValue === "unknown"
-    ) {
+    if (stateValue === "unavailable" || stateValue === "unknown") {
+      return "missing";
+    }
+    if (stateValue === "off" || stateValue === "clear") {
       return "clear";
     }
     return "active";
